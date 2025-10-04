@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zap server", "Zap server\Zap server.csproj", "{CE52C7A1-FF3E-4DA6-980B-415F02205606}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zap.BLL", "Zap.BLL\Zap.BLL.csproj", "{9402B76E-24A3-4826-A757-4AA8927B4F79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zap.DAL", "Zap.DAL\Zap.DAL.csproj", "{B7AC541D-39C1-4DFB-89AD-E492B9211680}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE52C7A1-FF3E-4DA6-980B-415F02205606}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE52C7A1-FF3E-4DA6-980B-415F02205606}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE52C7A1-FF3E-4DA6-980B-415F02205606}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE52C7A1-FF3E-4DA6-980B-415F02205606}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9402B76E-24A3-4826-A757-4AA8927B4F79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9402B76E-24A3-4826-A757-4AA8927B4F79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9402B76E-24A3-4826-A757-4AA8927B4F79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9402B76E-24A3-4826-A757-4AA8927B4F79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7AC541D-39C1-4DFB-89AD-E492B9211680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7AC541D-39C1-4DFB-89AD-E492B9211680}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7AC541D-39C1-4DFB-89AD-E492B9211680}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7AC541D-39C1-4DFB-89AD-E492B9211680}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {63928EAF-ED59-441F-9440-D8FDE5782692}
+	EndGlobalSection
+EndGlobal
