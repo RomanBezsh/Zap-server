@@ -17,11 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Zap.BLL\Zap.BLL.csproj" />
+    <ProjectReference Include="..\Zap.DAL\Zap.DAL.csproj" />
   </ItemGroup>
 
 </Project>

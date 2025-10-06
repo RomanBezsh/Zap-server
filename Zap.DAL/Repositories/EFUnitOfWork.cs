@@ -12,10 +12,10 @@ namespace Zap.DAL.Repositories
     public class EFUnitOfWork : IUnitOfWork
     {
         private ZapContext _db;
-        private UserRepository? _userRepository;
-        private PostRepository? _postRepository;
-        private CommentRepository? _commentRepository;
-        private MediaAttachmentRepository? _mediaAttachment;
+        private UserRepository _userRepository;
+        private PostRepository _postRepository;
+        private CommentRepository _commentRepository;
+        private MediaAttachmentRepository _mediaAttachment;
         public EFUnitOfWork(ZapContext context)
         {
             _db = context;
