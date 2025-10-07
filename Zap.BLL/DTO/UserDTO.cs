@@ -9,14 +9,14 @@ namespace Zap.BLL.DTO
     public class UserDTO
     {
         public int Id { get; set; }
-        public string Username { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string PasswordHash { get; set; } = string.Empty;
-        public string DisplayName { get; set; } = string.Empty;
+        public string Username { get; set; } 
+        public string Email { get; set; } 
+        public string PasswordHash { get; set; } 
+        public string DisplayName { get; set; } 
         public DateTime DateOfBirth { get; set; }
-        public string ProfileImageUrl { get; set; } = string.Empty;
-        public string Bio { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string ProfileImageUrl { get; set; } 
+        public string Bio { get; set; } 
+        public DateTime CreatedAt { get; set; } 
         public bool IsEmailVerified { get; set; } = false;
         public bool IsSuspended { get; set; } = false;
     }

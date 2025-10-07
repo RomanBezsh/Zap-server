@@ -11,22 +11,16 @@ namespace Zap.BLL.DTO
     {
         public int Id { get; set; }
 
-        // ID автора комментария
         public int UserId { get; set; }
 
-        // Имя или ник автора (если нужно отобразить)
         public string AuthorName { get; set; } = string.Empty;
 
-        // ID поста, к которому относится комментарий
         public int PostId { get; set; }
 
-        // Текст комментария
         public string Content { get; set; } = string.Empty;
 
-        // Дата публикации
         public DateTime CreatedAt { get; set; }
 
-        // Количество лайков
         public int LikesCount { get; set; }
     }
 

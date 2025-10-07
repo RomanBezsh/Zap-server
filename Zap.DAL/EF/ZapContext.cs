@@ -28,7 +28,7 @@ namespace Zap.DAL.EF
                 .HasOne(c => c.Author)
                 .WithMany(u => u.Comments)
                 .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.NoAction); // 🚀 Ключевая строчка
+                .OnDelete(DeleteBehavior.NoAction); 
         }
         
     }

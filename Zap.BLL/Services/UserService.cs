@@ -19,7 +19,6 @@ namespace Zap.BLL.Services
         {
             Database = uow;
         }
-
         public async Task CreateUser(UserDTO userDTO)
         {
             User user = new User
@@ -84,7 +83,7 @@ namespace Zap.BLL.Services
             }
             return null;
         }
-        public async Task<IEnumerable<UserDTO>> GetUsers()
+        public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
             var users = await Database.Users.GetAllAsync();
             return users.Select(user => new UserDTO

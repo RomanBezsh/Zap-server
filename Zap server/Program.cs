@@ -11,8 +11,10 @@ builder.Services.AddZapContext(
     builder.Configuration.GetConnectionString("DefaultConnection"));
 
 builder.Services.AddUnitOfWorkService();
-
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IMediaAttachmentService, MediaAttachmentService>();
 
 builder.Services.AddOpenApi();
 
@@ -23,6 +25,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseRouting();
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

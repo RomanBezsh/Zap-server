@@ -14,6 +14,7 @@ namespace Zap.BLL.Interfaces
         Task CreateUser(UserDTO userDTO);
         Task UpdateUser(UserDTO userDTO);
         Task DeleteUser(int id);
-        Task<IEnumerable<UserDTO>> GetUsers();
+        Task<UserDTO?> GetUser(int id);
+        Task<IEnumerable<UserDTO>> GetAllUsers();
     }
 }
