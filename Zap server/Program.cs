@@ -18,7 +18,7 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMediaAttachmentService, MediaAttachmentService>();
 
-
+//проверка
 
 var app = builder.Build();
 
