@@ -1,6 +1,8 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Zap.BLL.DTO;
@@ -31,8 +33,8 @@ namespace Zap.BLL.Services
                 ReplyToPostId = postDTO.ReplyToPostId
             };
             await Database.Posts.AddAsync(post);
+            await Database.SaveAsync();
         }
-
         public async Task UpdatePost(PostDTO postDTO)
         {
             var post = await Database.Posts.GetByIdAsync(postDTO.Id);
@@ -45,9 +47,9 @@ namespace Zap.BLL.Services
                 post.RepostsCount = postDTO.RepostsCount;
                 post.ReplyToPostId = postDTO.ReplyToPostId;
                 Database.Posts.Update(post);
+                await Database.SaveAsync();
             }
         }
-
         public async Task DeletePost(int id)
         {
             var post = await Database.Posts.GetByIdAsync(id);
@@ -56,7 +58,6 @@ namespace Zap.BLL.Services
                 Database.Posts.Delete(post);
             }
         }
-
         public async Task<PostDTO?> GetPostById(int id)
         {
             var post = await Database.Posts.GetByIdAsync(id);
@@ -92,38 +93,22 @@ namespace Zap.BLL.Services
             };
             return postDTO;
         }
-
         public async Task<IEnumerable<PostDTO>> GetAllPosts()
         {
-            var posts = await Database.Posts.GetAllAsync();
-            return posts.Select(post => new PostDTO
+            var config = new MapperConfiguration(cfg =>
             {
-                Id = post.Id,
-                UserId = post.UserId,
-                AuthorUsername = post.Author?.Username,
-                Content = post.Content,
-                CreatedAt = post.CreatedAt,
-                LikesCount = post.LikesCount,
-                RepostsCount = post.RepostsCount,
-                ReplyToPostId = post.ReplyToPostId,
-                Comments = post.Comments.Select(c => new CommentDTO
-                {
-                    Id = c.Id,
-                    UserId = c.UserId,
-                    AuthorName = c.Author?.Username ?? string.Empty,
-                    PostId = c.PostId,
-                    Content = c.Content,
-                    CreatedAt = c.CreatedAt,
-                    LikesCount = c.LikesCount
-                }).ToList(),
-                Attachments = post.Attachments.Select(a => new MediaAttachmentDTO
-                {
-                    Id = a.Id,
-                    PostId = a.PostId,
-                    Url = a.Url,
-                    MediaType = a.MediaType
-                }).ToList()
+                cfg.CreateMap<Post, PostDTO>()
+                    .ForMember(dest => dest.AuthorUsername, opt => opt.MapFrom(src => src.Author != null ? src.Author.Username : string.Empty));
+
+                cfg.CreateMap<Comment, CommentDTO>()
+                    .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author != null ? src.Author.Username : string.Empty));
+
+                cfg.CreateMap<MediaAttachment, MediaAttachmentDTO>();
             });
+            var mapper = config.CreateMapper();
+            return mapper.Map<IEnumerable<Post>, IEnumerable<PostDTO>>(await Database.Posts.GetAllAsync());
         }
+
+
     }
 }

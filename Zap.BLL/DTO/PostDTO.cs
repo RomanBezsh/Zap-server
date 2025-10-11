@@ -23,8 +23,8 @@ namespace Zap.BLL.DTO
 
         public int? ReplyToPostId { get; set; }
 
-        public List<CommentDTO> Comments { get; set; } = [];
+        public List<CommentDTO> Comments { get; set; } = new();
 
-        public List<MediaAttachmentDTO> Attachments { get; set; } = [];
+        public List<MediaAttachmentDTO> Attachments { get; set; } = new();
     }
 }

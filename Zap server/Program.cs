@@ -7,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddZapContext(
     builder.Configuration.GetConnectionString("DefaultConnection"));
 
@@ -16,13 +18,14 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMediaAttachmentService, MediaAttachmentService>();
 
-builder.Services.AddOpenApi();
+
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseRouting();
@@ -32,4 +35,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-

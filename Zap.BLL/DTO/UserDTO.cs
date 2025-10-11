@@ -17,7 +17,7 @@ namespace Zap.BLL.DTO
         public string ProfileImageUrl { get; set; } 
         public string Bio { get; set; } 
         public DateTime CreatedAt { get; set; } 
-        public bool IsEmailVerified { get; set; } = false;
-        public bool IsSuspended { get; set; } = false;
+        public bool IsEmailVerified { get; set; } 
+        public bool IsSuspended { get; set; } 
     }
 }

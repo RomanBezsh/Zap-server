@@ -12,6 +12,7 @@ namespace Zap.BLL.Interfaces
         Task CreateComment(CommentDTO postDTO);
         Task UpdateComment(CommentDTO postDTO);
         Task DeleteComment(int id);
+        Task<CommentDTO?> GetCommentById(int id);
         Task<IEnumerable<CommentDTO>> GetAllComments();
     }
 }

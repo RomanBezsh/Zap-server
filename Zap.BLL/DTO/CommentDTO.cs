@@ -13,11 +13,11 @@ namespace Zap.BLL.DTO
 
         public int UserId { get; set; }
 
-        public string AuthorName { get; set; } = string.Empty;
+        public string AuthorName { get; set; } 
 
         public int PostId { get; set; }
 
-        public string Content { get; set; } = string.Empty;
+        public string Content { get; set; } 
 
         public DateTime CreatedAt { get; set; }
 

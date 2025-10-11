@@ -33,53 +33,60 @@ namespace Zap_server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] UserDTO userDTO, [FromForm] IFormFile? profileImage)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult> CreateUser([FromForm] UserDTO userDTO, IFormFile? profileImage)
         {
             if (profileImage != null)
             {
                 var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
                 if (!Directory.Exists(uploadsFolder))
-                {
                     Directory.CreateDirectory(uploadsFolder);
-                }
+
                 var uniqueFileName = Guid.NewGuid().ToString("N") + Path.GetExtension(profileImage.FileName);
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await profileImage.CopyToAsync(fileStream);
                 }
+
                 userDTO.ProfileImageUrl = $"/media/{uniqueFileName}";
-                await _userService.CreateUser(userDTO);
             }
+
+            await _userService.CreateUser(userDTO);
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDTO userDTO, [FromForm] IFormFile? profileImage)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult> UpdateUser(int id, [FromForm] UserDTO userDTO, IFormFile? profileImage)
         {
             if (id != userDTO.Id)
                 return BadRequest("User ID mismatch");
+
             if (profileImage != null)
             {
                 var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
                 if (!Directory.Exists(uploadsFolder))
-                {
                     Directory.CreateDirectory(uploadsFolder);
-                }
+
                 var uniqueFileName = Guid.NewGuid().ToString("N") + Path.GetExtension(profileImage.FileName);
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await profileImage.CopyToAsync(fileStream);
                 }
+
                 userDTO.ProfileImageUrl = $"/media/{uniqueFileName}";
             }
+
             await _userService.UpdateUser(userDTO);
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<ActionResult> DeleteUser(int id)
         {
             await _userService.DeleteUser(id);
             return Ok();

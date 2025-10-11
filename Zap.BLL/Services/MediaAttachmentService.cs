@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
 using Zap.DAL.Entities;
 using Zap.DAL.Interfaces;
-
+using AutoMapper;
 namespace Zap.BLL.Services
 {
     public class MediaAttachmentService : IMediaAttachmentService
@@ -32,6 +33,7 @@ namespace Zap.BLL.Services
                 PostId = mediaAttachmentDTO.PostId
             };
             await Database.MediaAttachments.AddAsync(mediaAttachment);
+            await Database.SaveAsync();
         }
         public async Task UpdateMediaAttachment(MediaAttachmentDTO mediaAttachmentDTO)
         {
@@ -46,6 +48,7 @@ namespace Zap.BLL.Services
                 mediaAttachment.UploadedAt = mediaAttachmentDTO.UploadedAt;
                 mediaAttachment.PostId = mediaAttachmentDTO.PostId;
                 Database.MediaAttachments.Update(mediaAttachment);
+                await Database.SaveAsync();
             }
         }
         public async Task DeleteMediaAttachment(int id)
@@ -54,9 +57,10 @@ namespace Zap.BLL.Services
             if (mediaAttachment != null)
             {
                 Database.MediaAttachments.Delete(mediaAttachment);
+                await Database.SaveAsync();
             }
         }
-        public async Task<MediaAttachmentDTO> GetMediaAttachmentById(int id)
+        public async Task<MediaAttachmentDTO?> GetMediaAttachmentById(int id)
         {
             var mediaAttachment = await Database.MediaAttachments.GetByIdAsync(id);
             if (mediaAttachment == null)
@@ -75,20 +79,9 @@ namespace Zap.BLL.Services
         }
         public async Task<IEnumerable<MediaAttachmentDTO>> GetAllMediaAttachments()
         {
-            var mediaAttachments = await Database.MediaAttachments.GetAllAsync();
-            return mediaAttachments.Select(ma => new MediaAttachmentDTO
-            {
-                Id = ma.Id,
-                MediaType = ma.MediaType,
-                Url = ma.Url,
-                FileName = ma.FileName,
-                FileSize = ma.FileSize,
-                ContentType = ma.ContentType,
-                UploadedAt = ma.UploadedAt,
-                PostId = ma.PostId
-            });
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<MediaAttachment, MediaAttachmentDTO>()).CreateMapper();
+            return mapper.Map<IEnumerable<MediaAttachment>, IEnumerable<MediaAttachmentDTO>>(await Database.MediaAttachments.GetAllAsync());
         }
-
 
     }
 }

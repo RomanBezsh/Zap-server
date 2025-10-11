@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,6 +28,7 @@ namespace Zap.BLL.Services
                 CreatedAt = commentDTO.CreatedAt
             };
             await Database.Comments.AddAsync(comment);
+            await Database.SaveAsync();
         }
         public async Task UpdateComment(CommentDTO commentDTO)
         {
@@ -39,6 +41,7 @@ namespace Zap.BLL.Services
                 comment.CreatedAt = commentDTO.CreatedAt;
                 Database.Comments.Update(comment);
             }
+            await Database.SaveAsync();
         }
         public async Task DeleteComment(int id)
         {
@@ -47,6 +50,7 @@ namespace Zap.BLL.Services
             {
                 Database.Comments.Delete(comment);
             }
+            await Database.SaveAsync();
         }
         public async Task<CommentDTO?> GetCommentById(int id)
         {
@@ -66,15 +70,8 @@ namespace Zap.BLL.Services
         }
         public async Task<IEnumerable<CommentDTO>> GetAllComments()
         {
-            var comments = await Database.Comments.GetAllAsync();
-            return comments.Select(comment => new CommentDTO
-            {
-                Id = comment.Id,
-                PostId = comment.PostId,
-                UserId = comment.UserId,
-                Content = comment.Content,
-                CreatedAt = comment.CreatedAt
-            });
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Comment, CommentDTO>()).CreateMapper();
+            return mapper.Map<IEnumerable<Comment>, IEnumerable<CommentDTO>>(await Database.Comments.GetAllAsync());
         }
     }
 }

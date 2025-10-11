@@ -1,13 +1,15 @@
-﻿using System;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Zap.DAL.Interfaces;
-using Zap.DAL.Entities;
 using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
-using Microsoft.EntityFrameworkCore.Query.Internal;
+using Zap.DAL.Entities;
+using Zap.DAL.Interfaces;
+using AutoMapper;
 
 namespace Zap.BLL.Services
 {
@@ -35,6 +37,7 @@ namespace Zap.BLL.Services
                 IsSuspended = userDTO.IsSuspended
             };
             await Database.Users.AddAsync(user);
+            await Database.SaveAsync();
         }
         public async Task UpdateUser(UserDTO userDTO)
         {
@@ -51,6 +54,7 @@ namespace Zap.BLL.Services
                 user.IsEmailVerified = userDTO.IsEmailVerified;
                 user.IsSuspended = userDTO.IsSuspended;
                 Database.Users.Update(user);
+                await Database.SaveAsync();
             }
         }
         public async Task DeleteUser(int id)
@@ -59,6 +63,7 @@ namespace Zap.BLL.Services
             if (user != null)
             {
                 Database.Users.Delete(user);
+                await Database.SaveAsync();
             }
         }
         public async Task<UserDTO?> GetUser(int id)
@@ -85,21 +90,8 @@ namespace Zap.BLL.Services
         }
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
-            var users = await Database.Users.GetAllAsync();
-            return users.Select(user => new UserDTO
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                PasswordHash = user.PasswordHash,
-                DisplayName = user.DisplayName,
-                DateOfBirth = user.DateOfBirth,
-                ProfileImageUrl = user.ProfileImageUrl,
-                Bio = user.Bio,
-                CreatedAt = user.CreatedAt,
-                IsEmailVerified = user.IsEmailVerified,
-                IsSuspended = user.IsSuspended
-            });
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDTO>()).CreateMapper();
+            return mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(await Database.Users.GetAllAsync());
         }
 
     }

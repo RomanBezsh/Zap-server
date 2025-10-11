@@ -12,6 +12,7 @@ namespace Zap.BLL.Interfaces
         Task CreateMediaAttachment(MediaAttachmentDTO mediaAttachmentDTO);
         Task UpdateMediaAttachment(MediaAttachmentDTO mediaAttachmentDTO);
         Task DeleteMediaAttachment(int id);
+        Task<MediaAttachmentDTO?> GetMediaAttachmentById(int id);
         Task<IEnumerable<MediaAttachmentDTO>> GetAllMediaAttachments();
     }
 }
