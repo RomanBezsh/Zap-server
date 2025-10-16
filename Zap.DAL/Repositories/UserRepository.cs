@@ -28,7 +28,6 @@ namespace Zap.DAL.Repositories
         {
             return await _db.Users.FindAsync(id);
         }
-
         public async Task AddAsync(User entity)
         {
             await _db.Users.AddAsync(entity);

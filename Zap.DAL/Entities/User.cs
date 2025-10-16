@@ -18,6 +18,8 @@ namespace Zap.DAL.Entities
 
         public string DisplayName { get; set; }
 
+        public string PhoneNumber { get; set; }
+
         public DateTime DateOfBirth { get; set; }
 
         public string ProfileImageUrl { get; set; }

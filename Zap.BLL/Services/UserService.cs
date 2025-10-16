@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +12,6 @@ using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
 using Zap.DAL.Entities;
 using Zap.DAL.Interfaces;
-using AutoMapper;
 
 namespace Zap.BLL.Services
 {
@@ -30,6 +32,7 @@ namespace Zap.BLL.Services
                 PasswordHash = userDTO.PasswordHash,
                 DisplayName = userDTO.DisplayName,
                 DateOfBirth = userDTO.DateOfBirth,
+                PhoneNumber = userDTO.PhoneNumber,
                 ProfileImageUrl = userDTO.ProfileImageUrl,
                 Bio = userDTO.Bio,
                 CreatedAt = userDTO.CreatedAt,
@@ -49,6 +52,7 @@ namespace Zap.BLL.Services
                 user.PasswordHash = userDTO.PasswordHash;
                 user.DisplayName = userDTO.DisplayName;
                 user.DateOfBirth = userDTO.DateOfBirth;
+                user.PhoneNumber = userDTO.PhoneNumber;
                 user.ProfileImageUrl = userDTO.ProfileImageUrl;
                 user.Bio = userDTO.Bio;
                 user.IsEmailVerified = userDTO.IsEmailVerified;
@@ -79,6 +83,7 @@ namespace Zap.BLL.Services
                     PasswordHash = user.PasswordHash,
                     DisplayName = user.DisplayName,
                     DateOfBirth = user.DateOfBirth,
+                    PhoneNumber = user.PhoneNumber,
                     ProfileImageUrl = user.ProfileImageUrl,
                     Bio = user.Bio,
                     CreatedAt = user.CreatedAt,
@@ -87,6 +92,28 @@ namespace Zap.BLL.Services
                 };
             }
             return null;
+        }
+        public async Task<UserDTO?> GetUserByUsernameOrEmail(string usernameOrEmail)
+        {
+            var users = await Database.Users.GetAllAsync();
+            var user = users
+                .FirstOrDefault(u => u.Username == usernameOrEmail || u.Email == usernameOrEmail);
+
+            return new UserDTO
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                PasswordHash = user.PasswordHash,
+                DisplayName = user.DisplayName,
+                DateOfBirth = user.DateOfBirth,
+                PhoneNumber = user.PhoneNumber,
+                ProfileImageUrl = user.ProfileImageUrl,
+                Bio = user.Bio,
+                CreatedAt = user.CreatedAt,
+                IsEmailVerified = user.IsEmailVerified,
+                IsSuspended = user.IsSuspended
+            };
         }
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
