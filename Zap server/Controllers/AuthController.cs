@@ -55,5 +55,22 @@ namespace Zap_server.Controllers
                 Message = "Successs"
             });
         }
+
+        [HttpPost("send-verification-code")]
+        public async Task<ActionResult> SendVerificationCode([FromBody] SendVerificationCodeRequestDTO request)
+        {
+            await _authService.GenerateVerificationCodeAsync(request.Email);
+            return Ok(new { Message = "Код подтверждения отправлен на почту" });
+        }
+
+        [HttpPost("verify-code")]
+        public async Task<ActionResult> VerifyCode([FromBody] VerifyCodeRequestDTO request)
+        {
+            bool isValid = await _authService.VerifyCodeAsync(request.Email, request.Code);
+            if (!isValid)
+                return BadRequest(new { Message = "Неверный код или срок действия истёк" });
+
+            return Ok(new { Message = "Код подтвержден" });
+        }
     }
 }

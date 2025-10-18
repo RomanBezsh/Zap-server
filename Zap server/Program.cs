@@ -11,12 +11,15 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddZapContext(
     builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMediaAttachmentService, MediaAttachmentService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
+
 
 //проверка
 

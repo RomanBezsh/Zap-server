@@ -9,5 +9,7 @@ namespace Zap.BLL.Interfaces
     public interface IAuthService
     {
         Task<string> AuthenticateAndGenerateTokenAsync(string username, string password);
+        Task<string> GenerateVerificationCodeAsync(string email); 
+        Task<bool> VerifyCodeAsync(string email, string code);
     }
 }
