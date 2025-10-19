@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Zap.DAL.Entities
 {
@@ -10,27 +6,19 @@ namespace Zap.DAL.Entities
     {
         public int Id { get; set; }
 
-        // Тип вложения: image, video, audio, etc.
-        public string MediaType { get; set; } 
-
-        // Путь или URL к файлу
-        public string Url { get; set; } 
-
-        // Название файла (опционально)
-        public string FileName { get; set; } 
-
-        // Размер файла в байтах
+        public string MediaType { get; set; } = null!; // image, gif, video, etc.
+        public string Url { get; set; } = null!;
+        public string? FileName { get; set; }
         public long FileSize { get; set; }
+        public string ContentType { get; set; } = null!; // e.g. image/gif
+        public DateTime UploadedAt { get; set; }
 
-        // MIME-тип (например, image/jpeg)
-        public string ContentType { get; set; } 
-
-        // Дата загрузки
-        public DateTime UploadedAt { get; set; } 
-
-        // Связь с постом
-        public int PostId { get; set; }
+        // Связь с постом (если вложение к посту)
+        public int? PostId { get; set; }
         public Post? Post { get; set; }
-    }
 
+        // Связь с комментарием (если вложение к комментарию)
+        public int? CommentId { get; set; }
+        public Comment? Comment { get; set; }
+    }
 }

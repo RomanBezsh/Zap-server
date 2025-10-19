@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
 using System.Threading.Tasks;
 using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
@@ -14,90 +11,57 @@ namespace Zap.BLL.Services
 {
     public class PostService : IPostService
     {
-        IUnitOfWork Database { get; set; }
+        private readonly IUnitOfWork _database;
         private readonly IMapper _mapper;
 
         public PostService(IUnitOfWork uow, IMapper mapper)
         {
-            Database = uow;
+            _database = uow ?? throw new ArgumentNullException(nameof(uow));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task CreatePost(PostDTO postDTO)
         {
-            Post post = new Post
-            {
-                UserId = postDTO.UserId,
-                Content = postDTO.Content,
-                CreatedAt = postDTO.CreatedAt,
-                LikesCount = postDTO.LikesCount,
-                RepostsCount = postDTO.RepostsCount,
-                ReplyToPostId = postDTO.ReplyToPostId
-            };
-            await Database.Posts.AddAsync(post);
-            await Database.SaveAsync();
+            if (postDTO == null) throw new ArgumentNullException(nameof(postDTO));
+            var post = _mapper.Map<Post>(postDTO);
+            if (post.CreatedAt == default) post.CreatedAt = DateTime.UtcNow;
+            await _database.Posts.AddAsync(post);
+            await _database.SaveAsync();
         }
+
         public async Task UpdatePost(PostDTO postDTO)
         {
-            var post = await Database.Posts.GetByIdAsync(postDTO.Id);
+            if (postDTO == null) throw new ArgumentNullException(nameof(postDTO));
+            var post = await _database.Posts.GetByIdAsync(postDTO.Id);
             if (post != null)
             {
-                post.UserId = postDTO.UserId;
-                post.Content = postDTO.Content;
-                post.CreatedAt = postDTO.CreatedAt;
-                post.LikesCount = postDTO.LikesCount;
-                post.RepostsCount = postDTO.RepostsCount;
-                post.ReplyToPostId = postDTO.ReplyToPostId;
-                Database.Posts.Update(post);
-                await Database.SaveAsync();
+                _mapper.Map(postDTO, post);
+                _database.Posts.Update(post);
+                await _database.SaveAsync();
             }
         }
+
         public async Task DeletePost(int id)
         {
-            var post = await Database.Posts.GetByIdAsync(id);
+            var post = await _database.Posts.GetByIdAsync(id);
             if (post != null)
             {
-                Database.Posts.Delete(post);
+                _database.Posts.Delete(post);
+                await _database.SaveAsync();
             }
         }
+
         public async Task<PostDTO?> GetPostById(int id)
         {
-            var post = await Database.Posts.GetByIdAsync(id);
+            var post = await _database.Posts.GetByIdAsync(id);
             if (post == null)
                 return null;
-            var postDTO = new PostDTO
-            {
-                Id = post.Id,
-                UserId = post.UserId,
-                AuthorUsername = post.Author?.Username,
-                Content = post.Content,
-                CreatedAt = post.CreatedAt,
-                LikesCount = post.LikesCount,
-                RepostsCount = post.RepostsCount,
-                ReplyToPostId = post.ReplyToPostId,
-                Comments = post.Comments.Select(c => new CommentDTO
-                {
-                    Id = c.Id,
-                    UserId = c.UserId,
-                    AuthorName = c.Author?.Username ?? string.Empty,
-                    PostId = c.PostId,
-                    Content = c.Content,
-                    CreatedAt = c.CreatedAt,
-                    LikesCount = c.LikesCount
-                }).ToList(),
-                Attachments = post.Attachments.Select(a => new MediaAttachmentDTO
-                {
-                    Id = a.Id,
-                    PostId = a.PostId,
-                    Url = a.Url,
-                    MediaType = a.MediaType
-                }).ToList()
-            };
-            return postDTO;
+            return _mapper.Map<PostDTO>(post);
         }
+
         public async Task<IEnumerable<PostDTO>> GetAllPosts()
         {
-            var posts = await Database.Posts.GetAllAsync();
+            var posts = await _database.Posts.GetAllAsync();
             return _mapper.Map<IEnumerable<PostDTO>>(posts);
         }
     }

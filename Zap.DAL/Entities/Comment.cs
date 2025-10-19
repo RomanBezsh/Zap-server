@@ -1,4 +1,7 @@
-﻿namespace Zap.DAL.Entities
+﻿using System;
+using System.Collections.Generic;
+
+namespace Zap.DAL.Entities
 {
     public class Comment
     {
@@ -9,6 +12,9 @@
         public Post? Post { get; set; }
         public string? Content { get; set; }
         public DateTime CreatedAt { get; set; } 
-        public int LikesCount { get; set; } 
+        public int LikesCount { get; set; }
+
+        // Вложения (GIF/изображения) привязанные к комментарию
+        public ICollection<MediaAttachment> Attachments { get; set; } = new List<MediaAttachment>();
     }
 }

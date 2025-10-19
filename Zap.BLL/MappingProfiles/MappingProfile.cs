@@ -11,11 +11,13 @@ namespace Zap.BLL.MappingProfiles
             CreateMap<User, UserDTO>().ReverseMap();
 
             CreateMap<Comment, CommentDTO>()
-                .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author != null ? src.Author.Username : string.Empty));
+                .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author != null ? src.Author.Username : string.Empty))
+                .ForMember(dest => dest.Attachments, opt => opt.MapFrom(src => src.Attachments));
 
             CreateMap<MediaAttachment, MediaAttachmentDTO>()
                 .ReverseMap()
-                .ForMember(dest => dest.Post, opt => opt.Ignore());
+                .ForMember(dest => dest.Post, opt => opt.Ignore())
+                .ForMember(dest => dest.Comment, opt => opt.Ignore());
 
             CreateMap<Post, PostDTO>()
                 .ForMember(dest => dest.AuthorUsername, opt => opt.MapFrom(src => src.Author != null ? src.Author.Username : string.Empty))

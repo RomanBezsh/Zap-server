@@ -20,7 +20,9 @@ namespace Zap.BLL.DTO
 
         public string ContentType { get; set; }
 
-        public int PostId { get; set; }
+        public int? PostId { get; set; }
+
+        public int? CommentId { get; set; }
 
         public DateTime UploadedAt { get; set; }
     }

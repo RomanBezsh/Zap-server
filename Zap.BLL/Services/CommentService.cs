@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
@@ -13,65 +11,58 @@ namespace Zap.BLL.Services
 {
     public class CommentService : ICommentService
     {
-        IUnitOfWork Database { get; set; }
-        public CommentService(IUnitOfWork uow)
+        private readonly IUnitOfWork _database;
+        private readonly IMapper _mapper;
+
+        public CommentService(IUnitOfWork uow, IMapper mapper)
         {
-            Database = uow;
+            _database = uow ?? throw new ArgumentNullException(nameof(uow));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+
         public async Task CreateComment(CommentDTO commentDTO)
         {
-            Comment comment = new Comment
-            {
-                PostId = commentDTO.PostId,
-                UserId = commentDTO.UserId,
-                Content = commentDTO.Content,
-                CreatedAt = commentDTO.CreatedAt
-            };
-            await Database.Comments.AddAsync(comment);
-            await Database.SaveAsync();
+            if (commentDTO == null) throw new ArgumentNullException(nameof(commentDTO));
+            var comment = _mapper.Map<Comment>(commentDTO);
+            if (comment.CreatedAt == default) comment.CreatedAt = DateTime.UtcNow;
+            await _database.Comments.AddAsync(comment);
+            await _database.SaveAsync();
         }
+
         public async Task UpdateComment(CommentDTO commentDTO)
         {
-            var comment = await Database.Comments.GetByIdAsync(commentDTO.Id);
+            if (commentDTO == null) throw new ArgumentNullException(nameof(commentDTO));
+            var comment = await _database.Comments.GetByIdAsync(commentDTO.Id);
             if (comment != null)
             {
-                comment.PostId = commentDTO.PostId;
-                comment.UserId = commentDTO.UserId;
-                comment.Content = commentDTO.Content;
-                comment.CreatedAt = commentDTO.CreatedAt;
-                Database.Comments.Update(comment);
+                _mapper.Map(commentDTO, comment);
+                _database.Comments.Update(comment);
+                await _database.SaveAsync();
             }
-            await Database.SaveAsync();
         }
+
         public async Task DeleteComment(int id)
         {
-            var comment = await Database.Comments.GetByIdAsync(id);
+            var comment = await _database.Comments.GetByIdAsync(id);
             if (comment != null)
             {
-                Database.Comments.Delete(comment);
+                _database.Comments.Delete(comment);
+                await _database.SaveAsync();
             }
-            await Database.SaveAsync();
         }
+
         public async Task<CommentDTO?> GetCommentById(int id)
         {
-            var comment = await Database.Comments.GetByIdAsync(id);
-            if (comment != null)
-            {
-                return new CommentDTO
-                {
-                    Id = comment.Id,
-                    PostId = comment.PostId,
-                    UserId = comment.UserId,
-                    Content = comment.Content,
-                    CreatedAt = comment.CreatedAt
-                };
-            }
-            return null;
+            var comment = await _database.Comments.GetByIdAsync(id);
+            if (comment == null)
+                return null;
+            return _mapper.Map<CommentDTO>(comment);
         }
+
         public async Task<IEnumerable<CommentDTO>> GetAllComments()
         {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Comment, CommentDTO>()).CreateMapper();
-            return mapper.Map<IEnumerable<Comment>, IEnumerable<CommentDTO>>(await Database.Comments.GetAllAsync());
+            var comments = await _database.Comments.GetAllAsync();
+            return _mapper.Map<IEnumerable<CommentDTO>>(comments);
         }
     }
 }
