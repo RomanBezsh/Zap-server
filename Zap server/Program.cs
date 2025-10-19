@@ -1,5 +1,7 @@
+using AutoMapper;
 using Zap.BLL.Infrastructure;
 using Zap.BLL.Interfaces;
+using Zap.BLL.MappingProfiles;
 using Zap.BLL.Services;
 using Zap.DAL.Infrastructure;
 
@@ -12,13 +14,18 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddZapContext(
     builder.Configuration.GetConnectionString("DefaultConnection"));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-
+var mappingConfig = new MapperConfiguration(cfg => {
+    cfg.AddProfile<MappingProfile>();
+});
+builder.Services.AddSingleton(mappingConfig.CreateMapper());
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMediaAttachmentService, MediaAttachmentService>();
+builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
+
 
 
 //проверка
