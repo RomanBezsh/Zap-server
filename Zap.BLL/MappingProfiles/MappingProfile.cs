@@ -1,7 +1,4 @@
 using AutoMapper;
-
-Zap.BLL\MappingProfiles\MappingProfile.cs
-using AutoMapper;
 using Zap.BLL.DTO;
 using Zap.DAL.Entities;
 
@@ -16,7 +13,9 @@ namespace Zap.BLL.MappingProfiles
             CreateMap<Comment, CommentDTO>()
                 .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author != null ? src.Author.Username : string.Empty));
 
-            CreateMap<MediaAttachment, MediaAttachmentDTO>().ReverseMap();
+            CreateMap<MediaAttachment, MediaAttachmentDTO>()
+                .ReverseMap()
+                .ForMember(dest => dest.Post, opt => opt.Ignore());
 
             CreateMap<Post, PostDTO>()
                 .ForMember(dest => dest.AuthorUsername, opt => opt.MapFrom(src => src.Author != null ? src.Author.Username : string.Empty))
