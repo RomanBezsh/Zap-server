@@ -13,9 +13,11 @@ namespace Zap.DAL.Repositories
     {
         private ZapContext _db;
         private UserRepository _userRepository;
+        private UserFollowRepository _userFollowRepository;
         private PostRepository _postRepository;
         private CommentRepository _commentRepository;
         private MediaAttachmentRepository _mediaAttachment;
+        
         public EFUnitOfWork(ZapContext context)
         {
             _db = context;
@@ -54,6 +56,16 @@ namespace Zap.DAL.Repositories
                 if (_mediaAttachment == null)
                     _mediaAttachment = new MediaAttachmentRepository(_db);
                 return _mediaAttachment;
+            }
+        }
+
+        public IRepository<UserFollow> UserFollows
+        {
+            get
+            {
+                if (_userFollowRepository == null)
+                    _userFollowRepository = new UserFollowRepository(_db);
+                return _userFollowRepository;
             }
         }
         public async Task SaveAsync()

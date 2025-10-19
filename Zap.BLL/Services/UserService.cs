@@ -1,12 +1,14 @@
-﻿using System;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore.Storage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
 using Zap.DAL.Entities;
 using Zap.DAL.Interfaces;
+using Zap.DAL.Repositories;
 
 namespace Zap.BLL.Services
 {
@@ -49,10 +51,7 @@ namespace Zap.BLL.Services
             if (userDTO == null) throw new ArgumentNullException(nameof(userDTO));
 
             var user = await _database.Users.GetByIdAsync(userDTO.Id);
-            if (user == null)
-            {
-                throw new KeyNotFoundException($"User with id {userDTO.Id} not found.");
-            }
+            if (user == null) throw new KeyNotFoundException($"User with id {userDTO.Id} not found.");
 
             user.Username = userDTO.Username;
             user.Email = userDTO.Email;
@@ -84,6 +83,7 @@ namespace Zap.BLL.Services
             var user = await _database.Users.GetByIdAsync(id);
             if (user == null) return null;
 
+            // AutoMapper will map Followers/Following -> UserShortDTO if navigation properties exist and are loaded.
             return _mapper.Map<UserDTO>(user);
         }
 
@@ -103,6 +103,43 @@ namespace Zap.BLL.Services
         {
             var users = await _database.Users.GetAllAsync();
             return _mapper.Map<IEnumerable<UserDTO>>(users);
+        }
+
+        public async Task FollowUser(int userId, int targetUserId)
+        {
+            if (userId == targetUserId)
+                throw new InvalidOperationException("Нельзя подписаться на самого себя.");
+
+            var user = await _database.Users.GetByIdAsync(userId);
+            var target = await _database.Users.GetByIdAsync(targetUserId);
+            if (user == null || target == null)
+                throw new KeyNotFoundException("User(s) not found.");
+
+            var follows = await _database.UserFollows.GetAllAsync();
+            var alreadyFollowing = follows.Any(uf => uf.FollowerId == userId && uf.FollowedId == targetUserId);
+            if (alreadyFollowing)
+                return;
+
+            var follow = new UserFollow
+            {
+                FollowerId = userId,
+                FollowedId = targetUserId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _database.UserFollows.AddAsync(follow);
+            await _database.SaveAsync();
+        }
+
+        public async Task UnfollowUser(int userId, int targetUserId)
+        {
+            var follows = await _database.UserFollows.GetAllAsync();
+            var follow = follows.FirstOrDefault(uf => uf.FollowerId == userId && uf.FollowedId == targetUserId);
+            if (follow != null)
+            {
+                _database.UserFollows.Delete(follow);
+                await _database.SaveAsync();
+            }
         }
     }
 }

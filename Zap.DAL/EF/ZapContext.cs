@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Zap.DAL.EF;
 using Zap.DAL.Entities;
 
 namespace Zap.DAL.EF
@@ -9,6 +10,7 @@ namespace Zap.DAL.EF
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<MediaAttachment> MediaAttachments { get; set; }
+        public DbSet<UserFollow> UserFollows { get; set; }
 
         public ZapContext(DbContextOptions<ZapContext> options) : base(options)
         {
@@ -39,11 +41,23 @@ namespace Zap.DAL.EF
                 .HasForeignKey(m => m.CommentId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<MediaAttachment>()
-                .HasOne(m => m.Post)
-                .WithMany(p => p.Attachments)
-                .HasForeignKey(m => m.PostId)
+            // Explicit many-to-many self-reference via join entity UserFollow
+            modelBuilder.Entity<UserFollow>()
+                .HasKey(uf => new { uf.FollowerId, uf.FollowedId });
+
+            modelBuilder.Entity<UserFollow>()
+                .HasOne(uf => uf.Follower)
+                .WithMany(u => u.Following)
+                .HasForeignKey(uf => uf.FollowerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserFollow>()
+                .HasOne(uf => uf.Followed)
+                .WithMany(u => u.Followers)
+                .HasForeignKey(uf => uf.FollowedId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // (Keep other mappings/configs as needed)
         }
     }
 }

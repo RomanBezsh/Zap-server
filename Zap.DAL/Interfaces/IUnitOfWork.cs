@@ -13,6 +13,7 @@ namespace Zap.DAL.Interfaces
         IRepository<Post> Posts { get; }
         IRepository<Comment> Comments { get; }
         IRepository<MediaAttachment> MediaAttachments { get; }
+        IRepository<UserFollow> UserFollows { get; }
         Task SaveAsync();
     }
 }
