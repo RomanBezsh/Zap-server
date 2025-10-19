@@ -15,10 +15,12 @@ namespace Zap.BLL.Services
     public class PostService : IPostService
     {
         IUnitOfWork Database { get; set; }
+        private readonly IMapper _mapper;
 
-        public PostService(IUnitOfWork uow)
+        public PostService(IUnitOfWork uow, IMapper mapper)
         {
             Database = uow;
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task CreatePost(PostDTO postDTO)
@@ -95,20 +97,8 @@ namespace Zap.BLL.Services
         }
         public async Task<IEnumerable<PostDTO>> GetAllPosts()
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Post, PostDTO>()
-                    .ForMember(dest => dest.AuthorUsername, opt => opt.MapFrom(src => src.Author != null ? src.Author.Username : string.Empty));
-
-                cfg.CreateMap<Comment, CommentDTO>()
-                    .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author != null ? src.Author.Username : string.Empty));
-
-                cfg.CreateMap<MediaAttachment, MediaAttachmentDTO>();
-            });
-            var mapper = config.CreateMapper();
-            return mapper.Map<IEnumerable<Post>, IEnumerable<PostDTO>>(await Database.Posts.GetAllAsync());
+            var posts = await Database.Posts.GetAllAsync();
+            return _mapper.Map<IEnumerable<PostDTO>>(posts);
         }
-
-
     }
 }

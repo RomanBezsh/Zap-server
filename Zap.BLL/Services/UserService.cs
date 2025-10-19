@@ -1,13 +1,8 @@
-﻿using AutoMapper;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using Microsoft.Identity.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
 using Zap.DAL.Entities;
@@ -17,15 +12,20 @@ namespace Zap.BLL.Services
 {
     public class UserService : IUserService
     {
-        IUnitOfWork Database { get; set; }
+        private readonly IUnitOfWork _database;
+        private readonly IMapper _mapper;
 
-        public UserService(IUnitOfWork uow)
+        public UserService(IUnitOfWork uow, IMapper mapper)
         {
-            Database = uow;
+            _database = uow ?? throw new ArgumentNullException(nameof(uow));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+
         public async Task CreateUser(UserDTO userDTO)
         {
-            User user = new User
+            if (userDTO == null) throw new ArgumentNullException(nameof(userDTO));
+
+            var user = new User
             {
                 Username = userDTO.Username,
                 Email = userDTO.Email,
@@ -35,91 +35,74 @@ namespace Zap.BLL.Services
                 PhoneNumber = userDTO.PhoneNumber,
                 ProfileImageUrl = userDTO.ProfileImageUrl,
                 Bio = userDTO.Bio,
-                CreatedAt = userDTO.CreatedAt,
+                CreatedAt = userDTO.CreatedAt == default ? DateTime.UtcNow : userDTO.CreatedAt,
                 IsEmailVerified = userDTO.IsEmailVerified,
                 IsSuspended = userDTO.IsSuspended
             };
-            await Database.Users.AddAsync(user);
-            await Database.SaveAsync();
+
+            await _database.Users.AddAsync(user);
+            await _database.SaveAsync();
         }
+
         public async Task UpdateUser(UserDTO userDTO)
         {
-            var user = await Database.Users.GetByIdAsync(userDTO.Id);
-            if (user != null)
+            if (userDTO == null) throw new ArgumentNullException(nameof(userDTO));
+
+            var user = await _database.Users.GetByIdAsync(userDTO.Id);
+            if (user == null)
             {
-                user.Username = userDTO.Username;
-                user.Email = userDTO.Email;
-                user.PasswordHash = userDTO.PasswordHash;
-                user.DisplayName = userDTO.DisplayName;
-                user.DateOfBirth = userDTO.DateOfBirth;
-                user.PhoneNumber = userDTO.PhoneNumber;
-                user.ProfileImageUrl = userDTO.ProfileImageUrl;
-                user.Bio = userDTO.Bio;
-                user.IsEmailVerified = userDTO.IsEmailVerified;
-                user.IsSuspended = userDTO.IsSuspended;
-                Database.Users.Update(user);
-                await Database.SaveAsync();
+                throw new KeyNotFoundException($"User with id {userDTO.Id} not found.");
             }
+
+            user.Username = userDTO.Username;
+            user.Email = userDTO.Email;
+            user.PasswordHash = userDTO.PasswordHash;
+            user.DisplayName = userDTO.DisplayName;
+            user.DateOfBirth = userDTO.DateOfBirth;
+            user.PhoneNumber = userDTO.PhoneNumber;
+            user.ProfileImageUrl = userDTO.ProfileImageUrl;
+            user.Bio = userDTO.Bio;
+            user.IsEmailVerified = userDTO.IsEmailVerified;
+            user.IsSuspended = userDTO.IsSuspended;
+
+            _database.Users.Update(user);
+            await _database.SaveAsync();
         }
+
         public async Task DeleteUser(int id)
         {
-            var user = await Database.Users.GetByIdAsync(id);
+            var user = await _database.Users.GetByIdAsync(id);
             if (user != null)
             {
-                Database.Users.Delete(user);
-                await Database.SaveAsync();
+                _database.Users.Delete(user);
+                await _database.SaveAsync();
             }
         }
+
         public async Task<UserDTO?> GetUser(int id)
         {
-            var user = await Database.Users.GetByIdAsync(id);
-            if (user != null)
-            {
-                return new UserDTO
-                {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Email = user.Email,
-                    PasswordHash = user.PasswordHash,
-                    DisplayName = user.DisplayName,
-                    DateOfBirth = user.DateOfBirth,
-                    PhoneNumber = user.PhoneNumber,
-                    ProfileImageUrl = user.ProfileImageUrl,
-                    Bio = user.Bio,
-                    CreatedAt = user.CreatedAt,
-                    IsEmailVerified = user.IsEmailVerified,
-                    IsSuspended = user.IsSuspended
-                };
-            }
-            return null;
+            var user = await _database.Users.GetByIdAsync(id);
+            if (user == null) return null;
+
+            return _mapper.Map<UserDTO>(user);
         }
+
         public async Task<UserDTO?> GetUserByUsernameOrEmail(string usernameOrEmail)
         {
-            var users = await Database.Users.GetAllAsync();
-            var user = users
-                .FirstOrDefault(u => u.Username == usernameOrEmail || u.Email == usernameOrEmail);
+            if (string.IsNullOrWhiteSpace(usernameOrEmail)) return null;
 
-            return new UserDTO
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                PasswordHash = user.PasswordHash,
-                DisplayName = user.DisplayName,
-                DateOfBirth = user.DateOfBirth,
-                PhoneNumber = user.PhoneNumber,
-                ProfileImageUrl = user.ProfileImageUrl,
-                Bio = user.Bio,
-                CreatedAt = user.CreatedAt,
-                IsEmailVerified = user.IsEmailVerified,
-                IsSuspended = user.IsSuspended
-            };
+            var users = await _database.Users.GetAllAsync();
+            var user = users.FirstOrDefault(u => u.Username == usernameOrEmail || u.Email == usernameOrEmail);
+
+            if (user == null) return null;
+
+            return _mapper.Map<UserDTO>(user);
         }
+
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDTO>()).CreateMapper();
-            return mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(await Database.Users.GetAllAsync());
+            var users = await _database.Users.GetAllAsync();
+            return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
-
     }
 }

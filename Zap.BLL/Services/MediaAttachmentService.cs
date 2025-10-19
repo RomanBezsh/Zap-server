@@ -1,87 +1,69 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
 using Zap.DAL.Entities;
 using Zap.DAL.Interfaces;
-using AutoMapper;
+
 namespace Zap.BLL.Services
 {
     public class MediaAttachmentService : IMediaAttachmentService
     {
-        IUnitOfWork Database { get; set; }
+        private readonly IUnitOfWork _database;
+        private readonly IMapper _mapper;
 
-        public MediaAttachmentService(IUnitOfWork uow)
+        public MediaAttachmentService(IUnitOfWork uow, IMapper mapper)
         {
-            Database = uow;
+            _database = uow ?? throw new ArgumentNullException(nameof(uow));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task CreateMediaAttachment(MediaAttachmentDTO mediaAttachmentDTO)
         {
-            MediaAttachment mediaAttachment = new MediaAttachment
-            {
-                MediaType = mediaAttachmentDTO.MediaType,
-                Url = mediaAttachmentDTO.Url,
-                FileName = mediaAttachmentDTO.FileName,
-                FileSize = mediaAttachmentDTO.FileSize,
-                ContentType = mediaAttachmentDTO.ContentType,
-                UploadedAt = mediaAttachmentDTO.UploadedAt,
-                PostId = mediaAttachmentDTO.PostId
-            };
-            await Database.MediaAttachments.AddAsync(mediaAttachment);
-            await Database.SaveAsync();
-        }
-        public async Task UpdateMediaAttachment(MediaAttachmentDTO mediaAttachmentDTO)
-        {
-            var mediaAttachment = await Database.MediaAttachments.GetByIdAsync(mediaAttachmentDTO.Id);
-            if (mediaAttachment != null)
-            {
-                mediaAttachment.MediaType = mediaAttachmentDTO.MediaType;
-                mediaAttachment.Url = mediaAttachmentDTO.Url;
-                mediaAttachment.FileName = mediaAttachmentDTO.FileName;
-                mediaAttachment.FileSize = mediaAttachmentDTO.FileSize;
-                mediaAttachment.ContentType = mediaAttachmentDTO.ContentType;
-                mediaAttachment.UploadedAt = mediaAttachmentDTO.UploadedAt;
-                mediaAttachment.PostId = mediaAttachmentDTO.PostId;
-                Database.MediaAttachments.Update(mediaAttachment);
-                await Database.SaveAsync();
-            }
-        }
-        public async Task DeleteMediaAttachment(int id)
-        {
-            var mediaAttachment = await Database.MediaAttachments.GetByIdAsync(id);
-            if (mediaAttachment != null)
-            {
-                Database.MediaAttachments.Delete(mediaAttachment);
-                await Database.SaveAsync();
-            }
-        }
-        public async Task<MediaAttachmentDTO?> GetMediaAttachmentById(int id)
-        {
-            var mediaAttachment = await Database.MediaAttachments.GetByIdAsync(id);
-            if (mediaAttachment == null)
-                return null;
-            return new MediaAttachmentDTO
-            {
-                Id = mediaAttachment.Id,
-                MediaType = mediaAttachment.MediaType,
-                Url = mediaAttachment.Url,
-                FileName = mediaAttachment.FileName,
-                FileSize = mediaAttachment.FileSize,
-                ContentType = mediaAttachment.ContentType,
-                UploadedAt = mediaAttachment.UploadedAt,
-                PostId = mediaAttachment.PostId
-            };
-        }
-        public async Task<IEnumerable<MediaAttachmentDTO>> GetAllMediaAttachments()
-        {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<MediaAttachment, MediaAttachmentDTO>()).CreateMapper();
-            return mapper.Map<IEnumerable<MediaAttachment>, IEnumerable<MediaAttachmentDTO>>(await Database.MediaAttachments.GetAllAsync());
+            if (mediaAttachmentDTO == null) throw new ArgumentNullException(nameof(mediaAttachmentDTO));
+
+            var mediaAttachment = _mapper.Map<MediaAttachment>(mediaAttachmentDTO);
+            if (mediaAttachment.UploadedAt == default) mediaAttachment.UploadedAt = DateTime.UtcNow;
+
+            await _database.MediaAttachments.AddAsync(mediaAttachment);
+            await _database.SaveAsync();
         }
 
+        public async Task UpdateMediaAttachment(MediaAttachmentDTO mediaAttachmentDTO)
+        {
+            if (mediaAttachmentDTO == null) throw new ArgumentNullException(nameof(mediaAttachmentDTO));
+
+            var mediaAttachment = await _database.MediaAttachments.GetByIdAsync(mediaAttachmentDTO.Id);
+            if (mediaAttachment != null)
+            {
+                _mapper.Map(mediaAttachmentDTO, mediaAttachment);
+                _database.MediaAttachments.Update(mediaAttachment);
+                await _database.SaveAsync();
+            }
+        }
+
+        public async Task DeleteMediaAttachment(int id)
+        {
+            var mediaAttachment = await _database.MediaAttachments.GetByIdAsync(id);
+            if (mediaAttachment != null)
+            {
+                _database.MediaAttachments.Delete(mediaAttachment);
+                await _database.SaveAsync();
+            }
+        }
+
+        public async Task<MediaAttachmentDTO?> GetMediaAttachmentById(int id)
+        {
+            var mediaAttachment = await _database.MediaAttachments.GetByIdAsync(id);
+            if (mediaAttachment == null)
+                return null;
+
+            return _mapper.Map<MediaAttachmentDTO>(mediaAttachment);
+        }
+
+        public async Task<IEnumerable<MediaAttachmentDTO>> GetAllMediaAttachments()
+        {
+            var attachments = await _database.MediaAttachments.GetAllAsync();
+            return _mapper.Map<IEnumerable<MediaAttachmentDTO>>(attachments);
+        }
     }
 }

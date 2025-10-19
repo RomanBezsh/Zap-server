@@ -10,29 +10,30 @@ namespace Zap.DAL.Entities
     {
         public int Id { get; set; }
 
-        public string Username { get; set; } 
+        public string? Username { get; set; }
 
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
-        public string PasswordHash { get; set; } 
+        public string? PasswordHash { get; set; }
 
-        public string DisplayName { get; set; }
+        public string? DisplayName { get; set; }
 
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         public DateTime DateOfBirth { get; set; }
 
-        public string ProfileImageUrl { get; set; }
+        public string? ProfileImageUrl { get; set; }
 
-        public string Bio { get; set; } 
+        public string? Bio { get; set; }
 
-        public DateTime CreatedAt { get; set; } 
+        public DateTime CreatedAt { get; set; }
 
         public bool IsEmailVerified { get; set; } = false;
 
         public bool IsSuspended { get; set; } = false;
 
-        public ICollection<Comment> Comments { get; set; } = [];
+        // Fixed initializer (was "[]", which is invalid)
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 
 }
