@@ -1,12 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using System.Text;
+using System;
 using System.Threading.Tasks;
 using Zap.BLL.Infrastructure;
 using Zap.BLL.Interfaces;
@@ -22,41 +18,39 @@ namespace Zap.BLL.Services
             _emailSettings = emailSettings.Value;
         }
 
-        public async Task SendVerificationCodeAsync(string email, string code)
+        public async Task SendVerificationCodeAsync(string recipientEmail, string code)
         {
-
             var message = new MimeMessage();
 
             message.From.Add(new MailboxAddress(_emailSettings.SenderName, _emailSettings.SenderEmail));
-            message.From.Add(new MailboxAddress(_emailSettings.SenderName, _emailSettings.FromAddress));
-            message.To.Add(new MailboxAddress("Пользователь Zap", email));
+            message.To.Add(new MailboxAddress("", recipientEmail));
+            message.Subject = "Код подтверждения Zap";
 
             var bodyBuilder = new BodyBuilder
             {
-                HtmlBody = $"<h2>Здравствуйте! Ваш код подтверждения: <strong>{code}</strong></h2>" +
-                           $"<p>Этот код действителен в течение 15 минут.</p>",
-                TextBody = $"Ваш код подтверждения: {code}. Этот код действителен в течение 15 минут."
+                HtmlBody = $@"
+                    <h2>Здравствуйте!</h2>
+                    <p>Ваш код подтверждения: <strong>{code}</strong></p>
+                    <p>Он действителен в течение <strong>15 минут</strong>.</p>",
+                TextBody = $"Ваш код подтверждения: {code}. Он действителен в течение 15 минут."
             };
+
             message.Body = bodyBuilder.ToMessageBody();
 
-            using (var client = new SmtpClient())
+            using var client = new SmtpClient();
+            try
             {
-                try
-                {
-                    await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.SmtpPort, SecureSocketOptions.StartTls);
-
-                    await client.AuthenticateAsync(_emailSettings.SenderEmail, _emailSettings.SenderPassword);
-
-                    await client.SendAsync(message);
-                }
-                catch (Exception ex)
-                {
-                    throw new ApplicationException($"Не удалось отправить письмо на адрес {email}. Ошибка: {ex.Message}", ex);
-                }
-                finally
-                {
-                    await client.DisconnectAsync(true);
-                }
+                await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.SmtpPort, SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(_emailSettings.SmtpUsername, _emailSettings.SmtpPassword);
+                await client.SendAsync(message);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Ошибка при отправке письма на {recipientEmail}: {ex.Message}", ex);
+            }
+            finally
+            {
+                await client.DisconnectAsync(true);
             }
         }
     }
