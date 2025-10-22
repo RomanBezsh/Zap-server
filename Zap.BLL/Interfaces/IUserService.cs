@@ -17,5 +17,9 @@ namespace Zap.BLL.Interfaces
         Task<UserDTO?> GetUser(int id);
         Task<UserDTO> GetUserByUsernameOrEmail(string usernameOrEmail);
         Task<IEnumerable<UserDTO>> GetAllUsers();
+        Task FollowUser(int userId, int targetUserId);
+        Task UnfollowUser(int userId, int targetUserId);
+        Task<bool> IsFollowingAsync(int userId, int targetUserId);
+        Task<IEnumerable<UserShortDTO>> GetFollowersAsync(int userId);
     }
 }

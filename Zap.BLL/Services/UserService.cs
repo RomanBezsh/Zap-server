@@ -140,5 +140,38 @@ namespace Zap.BLL.Services
                 await _database.SaveAsync();
             }
         }
+
+        public async Task<bool> IsFollowingAsync(int userId, int targetUserId)
+        {
+            var follows = await _database.UserFollows.GetAllAsync();
+            return follows.Any(f => f.FollowerId == userId && f.FollowedId == targetUserId);
+        }
+
+        public async Task<IEnumerable<UserShortDTO>> GetFollowersAsync(int userId)
+        {
+            var follows = await _database.UserFollows.GetAllAsync();
+
+            var followerIds = follows
+                .Where(f => f.FollowedId == userId)
+                .Select(f => f.FollowerId)
+                .ToList();
+
+            if (!followerIds.Any())
+                return new List<UserShortDTO>();
+
+            var users = await _database.Users.GetAllAsync();
+            var followers = users
+                .Where(u => followerIds.Contains(u.Id))
+                .Select(u => new UserShortDTO
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    ProfileImageUrl = u.ProfileImageUrl
+                })
+                .ToList();
+
+            return followers;
+        }
+
     }
 }
