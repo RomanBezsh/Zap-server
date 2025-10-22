@@ -16,5 +16,6 @@ namespace Zap.DAL.Entities
 
         // Вложения (GIF/изображения) привязанные к комментарию
         public ICollection<MediaAttachment> Attachments { get; set; } = new List<MediaAttachment>();
+        public ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
     }
 }

@@ -59,15 +59,12 @@ namespace Zap.BLL.Services
                 {
                     _verificationCodes.TryRemove(email, out _); 
 
-                    // Получаем пользователя по email (метод GetUserByUsernameOrEmail принимает username или email)
                     var user = await _userService.GetUserByUsernameOrEmail(email);
                     if (user == null)
                     {
-                        // Пользователь не найден — считаем верификацию неуспешной
                         return false;
                     }
 
-                    // Если ещё не помечен как верифицированный — выставляем и сохраняем
                     if (!user.IsEmailVerified)
                     {
                         user.IsEmailVerified = true;

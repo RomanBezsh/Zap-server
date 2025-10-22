@@ -17,7 +17,8 @@ namespace Zap.DAL.Repositories
         private PostRepository _postRepository;
         private CommentRepository _commentRepository;
         private MediaAttachmentRepository _mediaAttachment;
-        
+        private PostLikeRepository _postLikeRepository;
+        private CommentLikeRepository _commentLikeRepository;
         public EFUnitOfWork(ZapContext context)
         {
             _db = context;
@@ -66,6 +67,26 @@ namespace Zap.DAL.Repositories
                 if (_userFollowRepository == null)
                     _userFollowRepository = new UserFollowRepository(_db);
                 return _userFollowRepository;
+            }
+        }
+        public IRepository<PostLike> PostLikes
+        {
+            get
+            {
+                if (_postLikeRepository == null)
+                    _postLikeRepository = new PostLikeRepository(_db);
+                return _postLikeRepository;
+
+            }
+        }
+        public IRepository<CommentLike> CommentLikes
+        {
+            get
+            {
+                if (_commentLikeRepository == null)
+                    _commentLikeRepository = new CommentLikeRepository(_db);
+                return _commentLikeRepository;
+
             }
         }
         public async Task SaveAsync()

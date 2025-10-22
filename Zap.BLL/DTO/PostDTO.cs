@@ -26,5 +26,7 @@ namespace Zap.BLL.DTO
         public List<CommentDTO> Comments { get; set; } = new();
 
         public List<MediaAttachmentDTO> Attachments { get; set; } = new();
+
+        public bool IsLikedByCurrentUser { get; set; }
     }
 }

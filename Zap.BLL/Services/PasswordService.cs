@@ -25,7 +25,6 @@ namespace Zap.BLL.Services
                 MemorySize = MemoryKb
             };
             var hash = argon.GetBytes(32);
-            // encode params + salt + hash, e.g. "$argon2id$v=19$m=65536,t=3,p=2$<salt>$<hash>"
             var sSalt = Convert.ToBase64String(salt);
             var sHash = Convert.ToBase64String(hash);
             return $"m={MemoryKb},t={Iterations},p={DegreeOfParallelism}.{sSalt}.{sHash}";
@@ -35,7 +34,6 @@ namespace Zap.BLL.Services
         {
             var parts = hashedPassword.Split('.');
             if (parts.Length != 3) return false;
-            // parse params from parts[0] if needed
             var salt = Convert.FromBase64String(parts[1]);
             var storedHash = Convert.FromBase64String(parts[2]);
 

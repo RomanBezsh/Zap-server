@@ -24,5 +24,6 @@ namespace Zap.DAL.Entities
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
         public ICollection<MediaAttachment> Attachments { get; set; } = new List<MediaAttachment>();
+        public ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
     }
 }

@@ -83,7 +83,6 @@ namespace Zap.BLL.Services
             var user = await _database.Users.GetByIdAsync(id);
             if (user == null) return null;
 
-            // AutoMapper will map Followers/Following -> UserShortDTO if navigation properties exist and are loaded.
             return _mapper.Map<UserDTO>(user);
         }
 

@@ -22,5 +22,6 @@ namespace Zap.BLL.DTO
 
         // Attachments для GIF/изображений/видео в комментариях
         public List<MediaAttachmentDTO> Attachments { get; set; } = new();
+        public bool IsLikedByCurrentUser { get; set; }
     }
 }
