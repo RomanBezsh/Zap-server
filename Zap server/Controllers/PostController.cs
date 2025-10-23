@@ -34,6 +34,12 @@ namespace Zap_server.Controllers
                 return NotFound();
             return Ok(post);
         }
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetPostsByUser(int userId)
+        {
+            var posts = await _postService.GetPostsByUserAsync(userId);
+            return Ok(posts);
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromBody] PostDTO postDTO)

@@ -14,5 +14,7 @@ namespace Zap.BLL.Interfaces
         Task DeletePost(int id);
         Task<IEnumerable<PostDTO>> GetAllPosts();
         Task<PostDTO?> GetPostById(int id);
+        Task<IEnumerable<PostDTO>> GetPostsByUserAsync(int userId);
+
     }
 }

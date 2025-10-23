@@ -64,5 +64,16 @@ namespace Zap.BLL.Services
             var posts = await _db.Posts.GetAllAsync();
             return _mapper.Map<IEnumerable<PostDTO>>(posts);
         }
+
+        public async Task<IEnumerable<PostDTO>> GetPostsByUserAsync(int userId)
+        {
+            var posts = await _db.Posts.GetAllAsync();
+            var userPosts = posts
+                .Where(p => p.UserId == userId)
+                .OrderByDescending(p => p.CreatedAt);
+
+            return _mapper.Map<IEnumerable<PostDTO>>(userPosts);
+        }
+
     }
 }
