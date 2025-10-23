@@ -97,6 +97,20 @@ namespace Zap.BLL.Services
 
             return _mapper.Map<UserDTO>(user);
         }
+        public async Task<IEnumerable<UserDTO>> SearchUsersByUsername(string partialUsername)
+        {
+            if (string.IsNullOrWhiteSpace(partialUsername))
+                return new List<UserDTO>();
+
+            var users = await _db.Users.GetAllAsync();
+
+            var matchedUsers = users
+                .Where(u => u.Username.Contains(partialUsername, StringComparison.OrdinalIgnoreCase))
+                .Select(u => _mapper.Map<UserDTO>(u))
+                .ToList();
+
+            return matchedUsers;
+        }
 
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {

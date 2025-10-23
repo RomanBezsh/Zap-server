@@ -31,6 +31,15 @@ namespace Zap_server.Controllers
                 return NotFound();
             return Ok(user);
         }
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<UserDTO>>> SearchUsers([FromQuery] string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return BadRequest("Username parameter is required");
+
+            var users = await _userService.SearchUsersByUsername(username);
+            return Ok(users);
+        }
 
         [HttpPost]
         [Consumes("multipart/form-data")]
