@@ -31,7 +31,6 @@ namespace Zap.BLL.MappingProfiles
             CreateMap<Comment, CommentDTO>()
                 .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author != null ? src.Author.Username : string.Empty))
                 .ForMember(dest => dest.Attachments, opt => opt.MapFrom(src => src.Attachments))
-                .ForMember(dest => dest.LikesCount, opt => opt.MapFrom(src => src.CommentLikes != null ? src.CommentLikes.Count : 0))
                 .ForMember(dest => dest.IsLikedByCurrentUser, opt => opt.Ignore()) // вычисл€етс€ в сервисе
                 .ForMember(dest => dest.Replies, opt => opt.MapFrom(src => src.Replies)); // ?? добавл€ем маппинг дл€ ответов
 

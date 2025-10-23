@@ -92,5 +92,18 @@ namespace Zap_server.Controllers
             return Ok();
         }
 
+        [HttpGet("{id}/followers")]
+        public async Task<ActionResult<IEnumerable<UserShortDTO>>> GetFollowers(int id)
+        {
+            var followers = await _userService.GetFollowersAsync(id);
+            return Ok(followers);
+        }
+
+        [HttpGet("{id}/following")]
+        public async Task<ActionResult<IEnumerable<UserShortDTO>>> GetFollowing(int id)
+        {
+            var following = await _userService.GetFollowingAsync(id);
+            return Ok(following);
+        }
     }
 }
