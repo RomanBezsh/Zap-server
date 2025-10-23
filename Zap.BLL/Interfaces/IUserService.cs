@@ -21,5 +21,6 @@ namespace Zap.BLL.Interfaces
         Task UnfollowUser(int userId, int targetUserId);
         Task<bool> IsFollowingAsync(int userId, int targetUserId);
         Task<IEnumerable<UserShortDTO>> GetFollowersAsync(int userId);
+        Task<IEnumerable<UserShortDTO>> GetFollowingAsync(int userId);
     }
 }

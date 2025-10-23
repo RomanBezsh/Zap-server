@@ -9,10 +9,12 @@ namespace Zap.BLL.Interfaces
 {
     public interface ICommentService
     {
-        Task CreateComment(CommentDTO postDTO);
-        Task UpdateComment(CommentDTO postDTO);
+        Task CreateComment(CommentDTO commentDTO);
+        Task UpdateComment(CommentDTO commentDTO);
         Task DeleteComment(int id);
         Task<CommentDTO?> GetCommentById(int id);
         Task<IEnumerable<CommentDTO>> GetAllComments();
+        Task<IEnumerable<CommentDTO>> GetAllCommentsForPost(int postId);
+
     }
 }

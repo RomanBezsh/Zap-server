@@ -11,7 +11,7 @@ namespace Zap.DAL.Interfaces
     {
         IRepository<User> Users { get; }
         IRepository<Post> Posts { get; }
-        IRepository<Comment> Comments { get; }
+        ICommentRepository Comments { get; }
         IRepository<MediaAttachment> MediaAttachments { get; }
         IRepository<UserFollow> UserFollows { get; }
         IRepository<PostLike> PostLikes { get; }

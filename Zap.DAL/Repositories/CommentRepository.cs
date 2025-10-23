@@ -10,7 +10,7 @@ using Zap.DAL.Interfaces;
 
 namespace Zap.DAL.Repositories
 {
-    public class CommentRepository : IRepository<Comment>
+    public class CommentRepository : ICommentRepository
     {
         private ZapContext _db;
 
@@ -42,6 +42,20 @@ namespace Zap.DAL.Repositories
         public void Delete(Comment entity)
         {
             _db.Comments.Remove(entity);
+        }
+
+        public async Task<List<Comment>> GetCommentsForPostAsync(int postId)
+        {
+            return await _db.Comments
+                .Where(c => c.PostId == postId && c.ParentCommentId == null)
+                .Include(c => c.Author)
+                .Include(c => c.Attachments)
+                .Include(c => c.CommentLikes)
+                .Include(c => c.Replies)
+                    .ThenInclude(r => r.Author)
+                .Include(c => c.Replies)
+                    .ThenInclude(r => r.CommentLikes)
+                .ToListAsync();
         }
 
     }

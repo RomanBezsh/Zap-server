@@ -11,12 +11,12 @@ namespace Zap.BLL.Services
 {
     public class PostService : IPostService
     {
-        private readonly IUnitOfWork _database;
+        private readonly IUnitOfWork _db;
         private readonly IMapper _mapper;
 
         public PostService(IUnitOfWork uow, IMapper mapper)
         {
-            _database = uow ?? throw new ArgumentNullException(nameof(uow));
+            _db = uow ?? throw new ArgumentNullException(nameof(uow));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
@@ -25,35 +25,35 @@ namespace Zap.BLL.Services
             if (postDTO == null) throw new ArgumentNullException(nameof(postDTO));
             var post = _mapper.Map<Post>(postDTO);
             if (post.CreatedAt == default) post.CreatedAt = DateTime.UtcNow;
-            await _database.Posts.AddAsync(post);
-            await _database.SaveAsync();
+            await _db.Posts.AddAsync(post);
+            await _db.SaveAsync();
         }
 
         public async Task UpdatePost(PostDTO postDTO)
         {
             if (postDTO == null) throw new ArgumentNullException(nameof(postDTO));
-            var post = await _database.Posts.GetByIdAsync(postDTO.Id);
+            var post = await _db.Posts.GetByIdAsync(postDTO.Id);
             if (post != null)
             {
                 _mapper.Map(postDTO, post);
-                _database.Posts.Update(post);
-                await _database.SaveAsync();
+                _db.Posts.Update(post);
+                await _db.SaveAsync();
             }
         }
 
         public async Task DeletePost(int id)
         {
-            var post = await _database.Posts.GetByIdAsync(id);
+            var post = await _db.Posts.GetByIdAsync(id);
             if (post != null)
             {
-                _database.Posts.Delete(post);
-                await _database.SaveAsync();
+                _db.Posts.Delete(post);
+                await _db.SaveAsync();
             }
         }
 
         public async Task<PostDTO?> GetPostById(int id)
         {
-            var post = await _database.Posts.GetByIdAsync(id);
+            var post = await _db.Posts.GetByIdAsync(id);
             if (post == null)
                 return null;
             return _mapper.Map<PostDTO>(post);
@@ -61,7 +61,7 @@ namespace Zap.BLL.Services
 
         public async Task<IEnumerable<PostDTO>> GetAllPosts()
         {
-            var posts = await _database.Posts.GetAllAsync();
+            var posts = await _db.Posts.GetAllAsync();
             return _mapper.Map<IEnumerable<PostDTO>>(posts);
         }
     }

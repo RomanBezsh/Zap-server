@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Zap.BLL.DTO
 {
@@ -10,18 +9,21 @@ namespace Zap.BLL.DTO
 
         public int UserId { get; set; }
 
-        public string? AuthorName { get; set; } 
+        public string? AuthorName { get; set; }
 
         public int PostId { get; set; }
 
-        public string? Content { get; set; } 
+        public string? Content { get; set; }
 
         public DateTime CreatedAt { get; set; }
 
-        public int LikesCount { get; set; }
+        // === Новое ===
+        public int? ParentCommentId { get; set; } // ссылка на родительский комментарий
+        public List<CommentDTO> Replies { get; set; } = new(); // ответы на комментарий
 
-        // Attachments для GIF/изображений/видео в комментариях
-        public List<MediaAttachmentDTO> Attachments { get; set; } = new();
+        public int LikesCount { get; set; }
         public bool IsLikedByCurrentUser { get; set; }
+
+        public List<MediaAttachmentDTO> Attachments { get; set; } = new();
     }
 }

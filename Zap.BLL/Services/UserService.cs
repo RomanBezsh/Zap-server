@@ -14,12 +14,12 @@ namespace Zap.BLL.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUnitOfWork _database;
+        private readonly IUnitOfWork _db;
         private readonly IMapper _mapper;
 
         public UserService(IUnitOfWork uow, IMapper mapper)
         {
-            _database = uow ?? throw new ArgumentNullException(nameof(uow));
+            _db = uow ?? throw new ArgumentNullException(nameof(uow));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
@@ -42,15 +42,15 @@ namespace Zap.BLL.Services
                 IsSuspended = userDTO.IsSuspended
             };
 
-            await _database.Users.AddAsync(user);
-            await _database.SaveAsync();
+            await _db.Users.AddAsync(user);
+            await _db.SaveAsync();
         }
 
         public async Task UpdateUser(UserDTO userDTO)
         {
             if (userDTO == null) throw new ArgumentNullException(nameof(userDTO));
 
-            var user = await _database.Users.GetByIdAsync(userDTO.Id);
+            var user = await _db.Users.GetByIdAsync(userDTO.Id);
             if (user == null) throw new KeyNotFoundException($"User with id {userDTO.Id} not found.");
 
             user.Username = userDTO.Username;
@@ -64,23 +64,23 @@ namespace Zap.BLL.Services
             user.IsEmailVerified = userDTO.IsEmailVerified;
             user.IsSuspended = userDTO.IsSuspended;
 
-            _database.Users.Update(user);
-            await _database.SaveAsync();
+            _db.Users.Update(user);
+            await _db.SaveAsync();
         }
 
         public async Task DeleteUser(int id)
         {
-            var user = await _database.Users.GetByIdAsync(id);
+            var user = await _db.Users.GetByIdAsync(id);
             if (user != null)
             {
-                _database.Users.Delete(user);
-                await _database.SaveAsync();
+                _db.Users.Delete(user);
+                await _db.SaveAsync();
             }
         }
 
         public async Task<UserDTO?> GetUser(int id)
         {
-            var user = await _database.Users.GetByIdAsync(id);
+            var user = await _db.Users.GetByIdAsync(id);
             if (user == null) return null;
 
             return _mapper.Map<UserDTO>(user);
@@ -90,7 +90,7 @@ namespace Zap.BLL.Services
         {
             if (string.IsNullOrWhiteSpace(usernameOrEmail)) return null;
 
-            var users = await _database.Users.GetAllAsync();
+            var users = await _db.Users.GetAllAsync();
             var user = users.FirstOrDefault(u => u.Username == usernameOrEmail || u.Email == usernameOrEmail);
 
             if (user == null) return null;
@@ -100,7 +100,7 @@ namespace Zap.BLL.Services
 
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
-            var users = await _database.Users.GetAllAsync();
+            var users = await _db.Users.GetAllAsync();
             return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
 
@@ -109,12 +109,12 @@ namespace Zap.BLL.Services
             if (userId == targetUserId)
                 throw new InvalidOperationException("Нельзя подписаться на самого себя.");
 
-            var user = await _database.Users.GetByIdAsync(userId);
-            var target = await _database.Users.GetByIdAsync(targetUserId);
+            var user = await _db.Users.GetByIdAsync(userId);
+            var target = await _db.Users.GetByIdAsync(targetUserId);
             if (user == null || target == null)
                 throw new KeyNotFoundException("User(s) not found.");
 
-            var follows = await _database.UserFollows.GetAllAsync();
+            var follows = await _db.UserFollows.GetAllAsync();
             var alreadyFollowing = follows.Any(uf => uf.FollowerId == userId && uf.FollowedId == targetUserId);
             if (alreadyFollowing)
                 return;
@@ -126,30 +126,30 @@ namespace Zap.BLL.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _database.UserFollows.AddAsync(follow);
-            await _database.SaveAsync();
+            await _db.UserFollows.AddAsync(follow);
+            await _db.SaveAsync();
         }
 
         public async Task UnfollowUser(int userId, int targetUserId)
         {
-            var follows = await _database.UserFollows.GetAllAsync();
+            var follows = await _db.UserFollows.GetAllAsync();
             var follow = follows.FirstOrDefault(uf => uf.FollowerId == userId && uf.FollowedId == targetUserId);
             if (follow != null)
             {
-                _database.UserFollows.Delete(follow);
-                await _database.SaveAsync();
+                _db.UserFollows.Delete(follow);
+                await _db.SaveAsync();
             }
         }
 
         public async Task<bool> IsFollowingAsync(int userId, int targetUserId)
         {
-            var follows = await _database.UserFollows.GetAllAsync();
+            var follows = await _db.UserFollows.GetAllAsync();
             return follows.Any(f => f.FollowerId == userId && f.FollowedId == targetUserId);
         }
 
         public async Task<IEnumerable<UserShortDTO>> GetFollowersAsync(int userId)
         {
-            var follows = await _database.UserFollows.GetAllAsync();
+            var follows = await _db.UserFollows.GetAllAsync();
 
             var followerIds = follows
                 .Where(f => f.FollowedId == userId)
@@ -159,7 +159,7 @@ namespace Zap.BLL.Services
             if (!followerIds.Any())
                 return new List<UserShortDTO>();
 
-            var users = await _database.Users.GetAllAsync();
+            var users = await _db.Users.GetAllAsync();
             var followers = users
                 .Where(u => followerIds.Contains(u.Id))
                 .Select(u => new UserShortDTO
@@ -172,6 +172,31 @@ namespace Zap.BLL.Services
 
             return followers;
         }
+		public async Task<IEnumerable<UserShortDTO>> GetFollowingAsync(int userId)
+		{
+			var follows = await _db.UserFollows.GetAllAsync();
 
-    }
+			var followingIds = follows
+				.Where(f => f.FollowerId == userId)
+				.Select(f => f.FollowedId)
+				.ToList();
+
+			if (!followingIds.Any())
+				return new List<UserShortDTO>();
+
+			var users = await _db.Users.GetAllAsync();
+			var following = users
+				.Where(u => followingIds.Contains(u.Id))
+				.Select(u => new UserShortDTO
+				{
+					Id = u.Id,
+					Username = u.Username,
+					ProfileImageUrl = u.ProfileImageUrl
+				})
+				.ToList();
+
+			return following;
+		}
+
+	}
 }

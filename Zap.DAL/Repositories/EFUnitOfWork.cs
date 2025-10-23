@@ -41,7 +41,7 @@ namespace Zap.DAL.Repositories
                 return _postRepository;
             }
         }
-        public IRepository<Comment> Comments
+        public ICommentRepository Comments
         {
             get
             {
