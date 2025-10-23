@@ -21,7 +21,6 @@ namespace Zap.BLL.DTO
         public int? ParentCommentId { get; set; } // ссылка на родительский комментарий
         public List<CommentDTO> Replies { get; set; } = new(); // ответы на комментарий
 
-        public int LikesCount { get; set; }
         public bool IsLikedByCurrentUser { get; set; }
 
         public List<MediaAttachmentDTO> Attachments { get; set; } = new();
