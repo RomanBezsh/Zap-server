@@ -2,6 +2,18 @@
 using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
 
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Zap.BLL.DTO;
+using Zap.BLL.Interfaces;
+
+
 namespace Zap_server.Controllers
 {
     [Route("api/MediaAttachments")]
@@ -10,6 +22,7 @@ namespace Zap_server.Controllers
     {
         private readonly IMediaAttachmentService _mediaAttachmentService;
         private readonly IWebHostEnvironment _env;
+
         public MediaAttachmentController(IMediaAttachmentService mediaAttachmentService, IWebHostEnvironment env)
         {
             _mediaAttachmentService = mediaAttachmentService;
@@ -31,11 +44,48 @@ namespace Zap_server.Controllers
             return Ok(mediaAttachment);
         }
 
-        [HttpPost]
-        public async Task<ActionResult> CreateMediaAttachment([FromBody] MediaAttachmentDTO mediaAttachmentDTO)
+        // ✅ Основной endpoint для загрузки реальных файлов (принимает DTO с [FromForm])
+        [HttpPost("upload")]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult> UploadMedia([FromForm] UploadMediaRequestDTO request)
         {
-            await _mediaAttachmentService.CreateMediaAttachment(mediaAttachmentDTO);
-            return Ok();
+            var file = request?.File;
+            if (file == null || file.Length == 0)
+                return BadRequest("Файл не выбран");
+
+            var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var uniqueFileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fs = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fs);
+            }
+
+            var mediaType = file.ContentType.StartsWith("video")
+                ? "video"
+                : file.ContentType.StartsWith("image")
+                    ? "image"
+                    : "other";
+
+            var attachment = new MediaAttachmentDTO
+            {
+                MediaType = mediaType,
+                Url = $"/media/{uniqueFileName}",
+                FileName = file.FileName,
+                FileSize = file.Length,
+                ContentType = file.ContentType,
+                UploadedAt = DateTime.UtcNow,
+                PostId = request.PostId,
+                CommentId = request.CommentId
+            };
+
+            await _mediaAttachmentService.CreateMediaAttachment(attachment);
+
+            return Ok(new { Url = attachment.Url, Type = attachment.MediaType });
         }
 
         [HttpPut("{id}")]
@@ -53,7 +103,5 @@ namespace Zap_server.Controllers
             await _mediaAttachmentService.DeleteMediaAttachment(id);
             return Ok();
         }
-
-
     }
 }
