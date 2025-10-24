@@ -2,18 +2,6 @@
 using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
 
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Zap.BLL.DTO;
-using Zap.BLL.Interfaces;
-
-
 namespace Zap_server.Controllers
 {
     [Route("api/MediaAttachments")]
@@ -44,7 +32,6 @@ namespace Zap_server.Controllers
             return Ok(mediaAttachment);
         }
 
-        // ✅ Основной endpoint для загрузки реальных файлов (принимает DTO с [FromForm])
         [HttpPost("upload")]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult> UploadMedia([FromForm] UploadMediaRequestDTO request)

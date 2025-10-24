@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
 
