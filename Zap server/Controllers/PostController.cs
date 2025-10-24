@@ -42,11 +42,46 @@ namespace Zap_server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreatePost([FromBody] PostDTO postDTO)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreatePost([FromForm] string content, [FromForm] IFormFile? file)
         {
-            await _postService.CreatePost(postDTO);
-            return Ok();
+            var post = new PostDTO
+            {
+                Content = content,
+                CreatedAt = DateTime.UtcNow,
+                UserId = 1 // временно — потом брать из токена
+            };
+
+            await _postService.CreatePost(post);
+
+            if (file != null && file.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fs = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fs);
+                }
+
+                var attachment = new MediaAttachmentDTO
+                {
+                    Url = $"/media/{uniqueFileName}",
+                    FileName = file.FileName,
+                    ContentType = file.ContentType,
+                    UploadedAt = DateTime.UtcNow,
+                    PostId = post.Id
+                };
+
+                await _mediaAttachmentService.CreateMediaAttachment(attachment);
+            }
+
+            return Ok(new { Message = "Пост создан" });
         }
+
         [HttpPost("{id}/attachments")]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult> UploadAttachment(int id, IFormFile file)

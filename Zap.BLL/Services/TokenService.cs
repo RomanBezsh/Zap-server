@@ -1,14 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using Zap.BLL.DTO;
 using Zap.BLL.Interfaces;
+
 
 namespace Zap.BLL.Services
 {
@@ -23,19 +20,33 @@ namespace Zap.BLL.Services
 
         public string GenerateToken(UserDTO user)
         {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            // Защита от отсутствующей конфигурации
+            var keyString = _config["Jwt:Key"];
+            var issuer = _config["Jwt:Issuer"];
+            var audience = _config["Jwt:Audience"];
+
+            if (string.IsNullOrWhiteSpace(keyString))
+                throw new InvalidOperationException("JWT key is not configured. Set Jwt:Key in configuration (appsettings, environment or user-secrets).");
+            if (string.IsNullOrWhiteSpace(issuer))
+                throw new InvalidOperationException("JWT issuer is not configured. Set Jwt:Issuer in configuration.");
+            if (string.IsNullOrWhiteSpace(audience))
+                throw new InvalidOperationException("JWT audience is not configured. Set Jwt:Audience in configuration.");
+
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim("username", user.Username)
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+                new Claim("username", user.Username ?? string.Empty)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                _config["Jwt:Issuer"],
-                _config["Jwt:Audience"],
+                issuer,
+                audience,
                 claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds

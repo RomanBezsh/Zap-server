@@ -21,6 +21,8 @@ namespace Zap.BLL.DTO
         public DateTime CreatedAt { get; set; }
         public bool IsEmailVerified { get; set; }
         public bool IsSuspended { get; set; }
+        public string? VerificationCode { get; set; }
+        public DateTime? CodeExpiration { get; set; }
 
         // Use lightweight DTOs for followers/following to avoid deep recursion and large payloads
         public ICollection<UserShortDTO> Followers { get; set; } = new List<UserShortDTO>();

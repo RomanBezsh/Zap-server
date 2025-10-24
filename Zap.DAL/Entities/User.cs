@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Zap.DAL.Entities
 {
@@ -19,15 +20,18 @@ namespace Zap.DAL.Entities
         public bool IsEmailVerified { get; set; } = false;
         public bool IsSuspended { get; set; } = false;
 
+        // ⚠️ Не маппим эти поля на БД
+        [NotMapped]
+        public string? VerificationCode { get; set; }
+
+        [NotMapped]
+        public DateTime? CodeExpiration { get; set; }
+
         public ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
         public ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-        // Navigation collections for explicit join entity:
-        // Followers: users who follow THIS user (FollowedId == this.Id)
         public ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>();
-
-        // Following: users THIS user follows (FollowerId == this.Id)
         public ICollection<UserFollow> Following { get; set; } = new List<UserFollow>();
     }
 }

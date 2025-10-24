@@ -16,8 +16,7 @@ namespace Zap.BLL.Interfaces
         Task DeleteUser(int id);
         Task<UserDTO?> GetUser(int id);
         Task<IEnumerable<UserDTO>> SearchUsersByUsername(string partialUsername);
-
-        Task<UserDTO> GetUserByUsernameOrEmail(string usernameOrEmail);
+        Task<UserDTO?> GetUserByUsernameOrEmail(string usernameOrEmail);
         Task<IEnumerable<UserDTO>> GetAllUsers();
         Task FollowUser(int userId, int targetUserId);
         Task UnfollowUser(int userId, int targetUserId);

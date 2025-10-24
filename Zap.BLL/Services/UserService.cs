@@ -29,17 +29,17 @@ namespace Zap.BLL.Services
 
             var user = new User
             {
-                Username = userDTO.Username,
-                Email = userDTO.Email,
-                PasswordHash = userDTO.PasswordHash,
-                DisplayName = userDTO.DisplayName,
-                DateOfBirth = userDTO.DateOfBirth,
-                PhoneNumber = userDTO.PhoneNumber,
-                ProfileImageUrl = userDTO.ProfileImageUrl,
-                Bio = userDTO.Bio,
-                CreatedAt = userDTO.CreatedAt == default ? DateTime.UtcNow : userDTO.CreatedAt,
-                IsEmailVerified = userDTO.IsEmailVerified,
-                IsSuspended = userDTO.IsSuspended
+                Username = userDTO.Username ?? "Unknown",
+                Email = userDTO.Email ?? "",
+                PasswordHash = userDTO.PasswordHash ?? "",
+                DisplayName = string.IsNullOrWhiteSpace(userDTO.DisplayName) ? userDTO.Username : userDTO.DisplayName,
+                DateOfBirth = userDTO.DateOfBirth == default ? DateTime.UtcNow : userDTO.DateOfBirth,
+                PhoneNumber = userDTO.PhoneNumber ?? "",
+                ProfileImageUrl = userDTO.ProfileImageUrl ?? "",
+                Bio = userDTO.Bio ?? "",
+                CreatedAt = DateTime.UtcNow,
+                IsEmailVerified = false,
+                IsSuspended = false
             };
 
             await _db.Users.AddAsync(user);
@@ -48,11 +48,14 @@ namespace Zap.BLL.Services
 
         public async Task UpdateUser(UserDTO userDTO)
         {
-            if (userDTO == null) throw new ArgumentNullException(nameof(userDTO));
+            if (userDTO == null)
+                throw new ArgumentNullException(nameof(userDTO));
 
             var user = await _db.Users.GetByIdAsync(userDTO.Id);
-            if (user == null) throw new KeyNotFoundException($"User with id {userDTO.Id} not found.");
+            if (user == null)
+                throw new KeyNotFoundException($"User with id {userDTO.Id} not found.");
 
+            // Основные данные
             user.Username = userDTO.Username;
             user.Email = userDTO.Email;
             user.PasswordHash = userDTO.PasswordHash;
@@ -63,6 +66,10 @@ namespace Zap.BLL.Services
             user.Bio = userDTO.Bio;
             user.IsEmailVerified = userDTO.IsEmailVerified;
             user.IsSuspended = userDTO.IsSuspended;
+
+            // ⚠️ Эти поля мы игнорируем, т.к. их нет в базе
+            // user.VerificationCode = userDTO.VerificationCode;
+            // user.CodeExpiration = userDTO.CodeExpiration;
 
             _db.Users.Update(user);
             await _db.SaveAsync();
@@ -91,7 +98,12 @@ namespace Zap.BLL.Services
             if (string.IsNullOrWhiteSpace(usernameOrEmail)) return null;
 
             var users = await _db.Users.GetAllAsync();
-            var user = users.FirstOrDefault(u => u.Username == usernameOrEmail || u.Email == usernameOrEmail);
+            var normalized = usernameOrEmail.Trim().ToLower();
+
+            var user = users.FirstOrDefault(u =>
+                (u.Username != null && u.Username.Trim().ToLower() == normalized) ||
+                (u.Email != null && u.Email.Trim().ToLower() == normalized));
+
 
             if (user == null) return null;
 
