@@ -23,7 +23,7 @@ namespace Zap.BLL.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task CreateUser(UserDTO userDTO)
+        public async Task CreateUserAsync(UserDTO userDTO)
         {
             if (userDTO == null) throw new ArgumentNullException(nameof(userDTO));
 
@@ -46,7 +46,7 @@ namespace Zap.BLL.Services
             await _db.SaveAsync();
         }
 
-        public async Task UpdateUser(UserDTO userDTO)
+        public async Task UpdateUserAsync(UserDTO userDTO)
         {
             if (userDTO == null)
                 throw new ArgumentNullException(nameof(userDTO));
@@ -75,7 +75,7 @@ namespace Zap.BLL.Services
             await _db.SaveAsync();
         }
 
-        public async Task DeleteUser(int id)
+        public async Task DeleteUserAsync(int id)
         {
             var user = await _db.Users.GetByIdAsync(id);
             if (user != null)
@@ -85,7 +85,7 @@ namespace Zap.BLL.Services
             }
         }
 
-        public async Task<UserDTO?> GetUser(int id)
+        public async Task<UserDTO?> GetUserAsync(int id)
         {
             var user = await _db.Users.GetByIdAsync(id);
             if (user == null) return null;
@@ -93,7 +93,7 @@ namespace Zap.BLL.Services
             return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<UserDTO?> GetUserByUsernameOrEmail(string usernameOrEmail)
+        public async Task<UserDTO?> GetUserByUsernameOrEmailAsync(string usernameOrEmail)
         {
             if (string.IsNullOrWhiteSpace(usernameOrEmail)) return null;
 
@@ -109,7 +109,7 @@ namespace Zap.BLL.Services
 
             return _mapper.Map<UserDTO>(user);
         }
-        public async Task<IEnumerable<UserDTO>> SearchUsersByUsername(string partialUsername)
+        public async Task<IEnumerable<UserDTO>> SearchUsersByUsernameAsync(string partialUsername)
         {
             if (string.IsNullOrWhiteSpace(partialUsername))
                 return new List<UserDTO>();
@@ -124,13 +124,13 @@ namespace Zap.BLL.Services
             return matchedUsers;
         }
 
-        public async Task<IEnumerable<UserDTO>> GetAllUsers()
+        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
             var users = await _db.Users.GetAllAsync();
             return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
 
-        public async Task FollowUser(int userId, int targetUserId)
+        public async Task FollowUserAsync(int userId, int targetUserId)
         {
             if (userId == targetUserId)
                 throw new InvalidOperationException("Нельзя подписаться на самого себя.");
@@ -156,7 +156,7 @@ namespace Zap.BLL.Services
             await _db.SaveAsync();
         }
 
-        public async Task UnfollowUser(int userId, int targetUserId)
+        public async Task UnfollowUserAsync(int userId, int targetUserId)
         {
             var follows = await _db.UserFollows.GetAllAsync();
             var follow = follows.FirstOrDefault(uf => uf.FollowerId == userId && uf.FollowedId == targetUserId);

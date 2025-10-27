@@ -20,13 +20,13 @@ namespace Zap_server.Controllers
         [HttpGet]
         public async Task<IEnumerable<MediaAttachmentDTO>> GetMediaAttachments()
         {
-            return await _mediaAttachmentService.GetAllMediaAttachments();
+            return await _mediaAttachmentService.GetAllMediaAttachmentsAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<MediaAttachmentDTO?>> GetMediaAttachment(int id)
         {
-            var mediaAttachment = await _mediaAttachmentService.GetMediaAttachmentById(id);
+            var mediaAttachment = await _mediaAttachmentService.GetMediaAttachmentByIdAsync(id);
             if (mediaAttachment == null)
                 return NotFound();
             return Ok(mediaAttachment);
@@ -40,7 +40,7 @@ namespace Zap_server.Controllers
             if (file == null || file.Length == 0)
                 return BadRequest("Файл не выбран");
 
-            var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "media");
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
@@ -70,7 +70,7 @@ namespace Zap_server.Controllers
                 CommentId = request.CommentId
             };
 
-            await _mediaAttachmentService.CreateMediaAttachment(attachment);
+            await _mediaAttachmentService.CreateMediaAttachmentAsync(attachment);
 
             return Ok(new { Url = attachment.Url, Type = attachment.MediaType });
         }
@@ -80,14 +80,14 @@ namespace Zap_server.Controllers
         {
             if (id != mediaAttachmentDTO.Id)
                 return BadRequest();
-            await _mediaAttachmentService.UpdateMediaAttachment(mediaAttachmentDTO);
+            await _mediaAttachmentService.UpdateMediaAttachmentAsync(mediaAttachmentDTO);
             return Ok();
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteMediaAttachment(int id)
         {
-            await _mediaAttachmentService.DeleteMediaAttachment(id);
+            await _mediaAttachmentService.DeleteMediaAttachmentAsync(id);
             return Ok();
         }
     }

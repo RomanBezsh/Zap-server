@@ -22,7 +22,7 @@ namespace Zap_server.Controllers
         {
             try
             {
-                await _userService.FollowUser(userId, targetUserId);
+                await _userService.FollowUserAsync(userId, targetUserId);
                 return Ok(new { message = $"User {userId} now follows {targetUserId}" });
             }
             catch (InvalidOperationException ex)
@@ -38,7 +38,7 @@ namespace Zap_server.Controllers
         [HttpPost("unfollow/{userId}/{targetUserId}")]
         public async Task<IActionResult> UnfollowUser(int userId, int targetUserId)
         {
-            await _userService.UnfollowUser(userId, targetUserId);
+            await _userService.UnfollowUserAsync(userId, targetUserId);
             return Ok(new { message = $"User {userId} unfollowed {targetUserId}" });
         }
 

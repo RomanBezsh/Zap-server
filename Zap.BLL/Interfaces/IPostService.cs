@@ -9,11 +9,11 @@ namespace Zap.BLL.Interfaces
 {
     public interface IPostService
     {
-        Task CreatePost(PostDTO postDTO);
-        Task UpdatePost(PostDTO postDTO);
-        Task DeletePost(int id);
-        Task<IEnumerable<PostDTO>> GetAllPosts();
-        Task<PostDTO?> GetPostById(int id);
+        Task CreatePostAsync(PostDTO postDTO);
+        Task UpdatePostAsync(PostDTO postDTO);
+        Task DeletePostAsync(int id);
+        Task<IEnumerable<PostDTO>> GetAllPostsAsync();
+        Task<PostDTO?> GetPostByIdAsync(int id);
         Task<IEnumerable<PostDTO>> GetPostsByUserAsync(int userId);
 
     }

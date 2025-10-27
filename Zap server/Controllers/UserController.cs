@@ -19,13 +19,13 @@ namespace Zap_server.Controllers
         [HttpGet]
         public async Task<IEnumerable<UserDTO>> GetUsers()
         {
-            return await _userService.GetAllUsers();
+            return await _userService.GetAllUsersAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO?>> GetUser(int id)
         {
-            var user = await _userService.GetUser(id);
+            var user = await _userService.GetUserAsync(id);
             if (user == null)
                 return NotFound();
             return Ok(user);
@@ -36,7 +36,7 @@ namespace Zap_server.Controllers
             if (string.IsNullOrWhiteSpace(username))
                 return BadRequest("Username parameter is required");
 
-            var users = await _userService.SearchUsersByUsername(username);
+            var users = await _userService.SearchUsersByUsernameAsync(username);
             return Ok(users);
         }
 
@@ -46,7 +46,7 @@ namespace Zap_server.Controllers
         {
             if (profileImage != null)
             {
-                var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "media");
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
 
@@ -61,7 +61,7 @@ namespace Zap_server.Controllers
                 userDTO.ProfileImageUrl = $"/media/{uniqueFileName}";
             }
 
-            await _userService.CreateUser(userDTO);
+            await _userService.CreateUserAsync(userDTO);
             return Ok();
         }
 
@@ -74,7 +74,7 @@ namespace Zap_server.Controllers
 
             if (profileImage != null)
             {
-                var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "media");
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
 
@@ -89,14 +89,14 @@ namespace Zap_server.Controllers
                 userDTO.ProfileImageUrl = $"/media/{uniqueFileName}";
             }
 
-            await _userService.UpdateUser(userDTO);
+            await _userService.UpdateUserAsync(userDTO);
             return Ok();
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUser(int id)
         {
-            await _userService.DeleteUser(id);
+            await _userService.DeleteUserAsync(id);
             return Ok();
         }
 

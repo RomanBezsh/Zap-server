@@ -24,7 +24,7 @@ namespace Zap_server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CommentDTO>>> GetComments()
         {
-            var comments = await _commentService.GetAllComments();
+            var comments = await _commentService.GetAllCommentsAsync();
             return Ok(comments);
         }
 
@@ -32,7 +32,7 @@ namespace Zap_server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CommentDTO?>> GetComment(int id)
         {
-            var comment = await _commentService.GetCommentById(id);
+            var comment = await _commentService.GetCommentByIdAsync(id);
             if (comment == null)
                 return NotFound();
             return Ok(comment);
@@ -42,7 +42,7 @@ namespace Zap_server.Controllers
         [HttpGet("post/{postId}")]
         public async Task<ActionResult<IEnumerable<CommentDTO>>> GetCommentsForPost(int postId)
         {
-            var comments = await _commentService.GetAllCommentsForPost(postId);
+            var comments = await _commentService.GetAllCommentsForPostAsync(postId);
             if (!comments.Any())
                 return NotFound($"Комментарии для поста с Id {postId} не найдены.");
             return Ok(comments);
@@ -52,7 +52,7 @@ namespace Zap_server.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateComment([FromBody] CommentDTO commentDTO)
         {
-            await _commentService.CreateComment(commentDTO);
+            await _commentService.CreateCommentAsync(commentDTO);
             return Ok();
         }
 
@@ -63,7 +63,7 @@ namespace Zap_server.Controllers
             if (id != commentDTO.Id)
                 return BadRequest("Id комментария не совпадает.");
 
-            await _commentService.UpdateComment(commentDTO);
+            await _commentService.UpdateCommentAsync(commentDTO);
             return Ok();
         }
 
@@ -71,7 +71,7 @@ namespace Zap_server.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteComment(int id)
         {
-            await _commentService.DeleteComment(id);
+            await _commentService.DeleteCommentAsync(id);
             return Ok();
         }
 
@@ -82,7 +82,7 @@ namespace Zap_server.Controllers
             if (file == null || file.Length == 0)
                 return BadRequest("Файл не выбран.");
 
-            var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "media");
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
@@ -105,7 +105,7 @@ namespace Zap_server.Controllers
                 CommentId = commentId
             };
 
-            await _mediaAttachmentService.CreateMediaAttachment(attachment);
+            await _mediaAttachmentService.CreateMediaAttachmentAsync(attachment);
 
             return Ok(new { Url = attachment.Url });
         }

@@ -37,7 +37,7 @@ namespace Zap_server.Controllers
                 PhoneNumber = registerRequestDTO.PhoneNumber,
                 CreatedAt = DateTime.UtcNow,
             };
-            await _userService.CreateUser(userDTO);
+            await _userService.CreateUserAsync(userDTO);
             return Ok();
         }
 

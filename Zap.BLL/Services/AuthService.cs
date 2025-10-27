@@ -16,11 +16,7 @@ namespace Zap.BLL.Services
         // Храним коды прямо в памяти, не в БД
         private static readonly Dictionary<string, (string Code, DateTime Expiration)> _codes = new();
 
-        public AuthService(
-            IUserService userService,
-            IPasswordService passwordService,
-            ITokenService tokenService,
-            IEmailService emailService)
+        public AuthService(IUserService userService,IPasswordService passwordService,ITokenService tokenService, IEmailService emailService)
         {
             _userService = userService;
             _passwordService = passwordService;
@@ -30,7 +26,7 @@ namespace Zap.BLL.Services
 
         public async Task<string> AuthenticateAndGenerateTokenAsync(string usernameOrEmail, string password)
         {
-            var user = await _userService.GetUserByUsernameOrEmail(usernameOrEmail);
+            var user = await _userService.GetUserByUsernameOrEmailAsync(usernameOrEmail);
             if (user == null)
                 throw new UnauthorizedAccessException("Пользователь не найден");
 
@@ -43,7 +39,7 @@ namespace Zap.BLL.Services
         // Генерация кода
         public async Task<string> GenerateVerificationCodeAsync(string email)
         {
-            var user = await _userService.GetUserByUsernameOrEmail(email);
+            var user = await _userService.GetUserByUsernameOrEmailAsync(email);
             if (user == null)
                 throw new InvalidOperationException("Пользователь с таким email не найден");
 
@@ -65,11 +61,11 @@ namespace Zap.BLL.Services
                 if (entry.Code == code && entry.Expiration > DateTime.UtcNow)
                 {
                     _codes.Remove(email);
-                    var user = await _userService.GetUserByUsernameOrEmail(email);
+                    var user = await _userService.GetUserByUsernameOrEmailAsync(email);
                     if (user != null)
                     {
                         user.IsEmailVerified = true;
-                        await _userService.UpdateUser(user);
+                        await _userService.UpdateUserAsync(user);
                     }
                     return true;
                 }

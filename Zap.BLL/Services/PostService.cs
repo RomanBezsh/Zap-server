@@ -20,7 +20,7 @@ namespace Zap.BLL.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task CreatePost(PostDTO postDTO)
+        public async Task CreatePostAsync(PostDTO postDTO)
         {
             Console.WriteLine($"🟡 CreatePost вызван в сервисе. Content: {postDTO.Content}, UserId: {postDTO.UserId}");
 
@@ -35,7 +35,7 @@ namespace Zap.BLL.Services
         }
 
 
-        public async Task UpdatePost(PostDTO postDTO)
+        public async Task UpdatePostAsync(PostDTO postDTO)
         {
             if (postDTO == null) throw new ArgumentNullException(nameof(postDTO));
             var post = await _db.Posts.GetByIdAsync(postDTO.Id);
@@ -47,7 +47,7 @@ namespace Zap.BLL.Services
             }
         }
 
-        public async Task DeletePost(int id)
+        public async Task DeletePostAsync(int id)
         {
             var post = await _db.Posts.GetByIdAsync(id);
             if (post != null)
@@ -57,7 +57,7 @@ namespace Zap.BLL.Services
             }
         }
 
-        public async Task<PostDTO?> GetPostById(int id)
+        public async Task<PostDTO?> GetPostByIdAsync(int id)
         {
             var post = await _db.Posts.GetByIdAsync(id);
             if (post == null)
@@ -65,7 +65,7 @@ namespace Zap.BLL.Services
             return _mapper.Map<PostDTO>(post);
         }
 
-        public async Task<IEnumerable<PostDTO>> GetAllPosts()
+        public async Task<IEnumerable<PostDTO>> GetAllPostsAsync()
         {
             var posts = await _db.Posts.GetAllAsync();
             return _mapper.Map<IEnumerable<PostDTO>>(posts);

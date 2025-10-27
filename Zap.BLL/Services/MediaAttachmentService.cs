@@ -17,7 +17,7 @@ namespace Zap.BLL.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task CreateMediaAttachment(MediaAttachmentDTO mediaAttachmentDTO)
+        public async Task CreateMediaAttachmentAsync(MediaAttachmentDTO mediaAttachmentDTO)
         {
             if (mediaAttachmentDTO == null) throw new ArgumentNullException(nameof(mediaAttachmentDTO));
 
@@ -28,7 +28,7 @@ namespace Zap.BLL.Services
             await _db.SaveAsync();
         }
 
-        public async Task UpdateMediaAttachment(MediaAttachmentDTO mediaAttachmentDTO)
+        public async Task UpdateMediaAttachmentAsync(MediaAttachmentDTO mediaAttachmentDTO)
         {
             if (mediaAttachmentDTO == null) throw new ArgumentNullException(nameof(mediaAttachmentDTO));
 
@@ -41,7 +41,7 @@ namespace Zap.BLL.Services
             }
         }
 
-        public async Task DeleteMediaAttachment(int id)
+        public async Task DeleteMediaAttachmentAsync(int id)
         {
             var mediaAttachment = await _db.MediaAttachments.GetByIdAsync(id);
             if (mediaAttachment != null)
@@ -51,7 +51,7 @@ namespace Zap.BLL.Services
             }
         }
 
-        public async Task<MediaAttachmentDTO?> GetMediaAttachmentById(int id)
+        public async Task<MediaAttachmentDTO?> GetMediaAttachmentByIdAsync(int id)
         {
             var mediaAttachment = await _db.MediaAttachments.GetByIdAsync(id);
             if (mediaAttachment == null)
@@ -60,7 +60,7 @@ namespace Zap.BLL.Services
             return _mapper.Map<MediaAttachmentDTO>(mediaAttachment);
         }
 
-        public async Task<IEnumerable<MediaAttachmentDTO>> GetAllMediaAttachments()
+        public async Task<IEnumerable<MediaAttachmentDTO>> GetAllMediaAttachmentsAsync()
         {
             var attachments = await _db.MediaAttachments.GetAllAsync();
             return _mapper.Map<IEnumerable<MediaAttachmentDTO>>(attachments);

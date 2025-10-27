@@ -21,7 +21,7 @@ namespace Zap.BLL.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task CreateComment(CommentDTO commentDTO)
+        public async Task CreateCommentAsync(CommentDTO commentDTO)
         {
             if (commentDTO == null) throw new ArgumentNullException(nameof(commentDTO));
 
@@ -43,7 +43,7 @@ namespace Zap.BLL.Services
         }
 
 
-        public async Task UpdateComment(CommentDTO commentDTO)
+        public async Task UpdateCommentAsync(CommentDTO commentDTO)
         {
             var comment = await _db.Comments.GetByIdAsync(commentDTO.Id);
             if (comment == null) return;
@@ -52,7 +52,7 @@ namespace Zap.BLL.Services
             await _db.SaveAsync();
         }
 
-        public async Task DeleteComment(int id)
+        public async Task DeleteCommentAsync(int id)
         {
             var comment = await _db.Comments.GetByIdAsync(id);
             if (comment != null)
@@ -62,7 +62,7 @@ namespace Zap.BLL.Services
             }
         }
 
-        public async Task<CommentDTO?> GetCommentById(int id)
+        public async Task<CommentDTO?> GetCommentByIdAsync(int id)
         {
             var comment = await _db.Comments.GetByIdAsync(id);
             if (comment == null)
@@ -70,13 +70,13 @@ namespace Zap.BLL.Services
             return _mapper.Map<CommentDTO>(comment);
         }
 
-        public async Task<IEnumerable<CommentDTO>> GetAllComments()
+        public async Task<IEnumerable<CommentDTO>> GetAllCommentsAsync()
         {
             var comments = await _db.Comments.GetAllAsync();
             return _mapper.Map<IEnumerable<CommentDTO>>(comments);
         }
 
-        public async Task<IEnumerable<CommentDTO>> GetAllCommentsForPost(int postId)
+        public async Task<IEnumerable<CommentDTO>> GetAllCommentsForPostAsync(int postId)
         {
             var post = await _db.Posts.GetByIdAsync(postId);
             if (post == null)

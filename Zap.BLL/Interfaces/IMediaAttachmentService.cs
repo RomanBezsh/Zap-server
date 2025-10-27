@@ -9,10 +9,10 @@ namespace Zap.BLL.Interfaces
 {
     public interface IMediaAttachmentService
     {
-        Task CreateMediaAttachment(MediaAttachmentDTO mediaAttachmentDTO);
-        Task UpdateMediaAttachment(MediaAttachmentDTO mediaAttachmentDTO);
-        Task DeleteMediaAttachment(int id);
-        Task<MediaAttachmentDTO?> GetMediaAttachmentById(int id);
-        Task<IEnumerable<MediaAttachmentDTO>> GetAllMediaAttachments();
+        Task CreateMediaAttachmentAsync(MediaAttachmentDTO mediaAttachmentDTO);
+        Task UpdateMediaAttachmentAsync(MediaAttachmentDTO mediaAttachmentDTO);
+        Task DeleteMediaAttachmentAsync(int id);
+        Task<MediaAttachmentDTO?> GetMediaAttachmentByIdAsync(int id);
+        Task<IEnumerable<MediaAttachmentDTO>> GetAllMediaAttachmentsAsync();
     }
 }

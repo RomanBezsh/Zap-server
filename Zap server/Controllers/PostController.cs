@@ -23,13 +23,13 @@ namespace Zap_server.Controllers
         [HttpGet]
         public async Task<IEnumerable<PostDTO>> GetPosts()
         {
-            return await _postService.GetAllPosts();
+            return await _postService.GetAllPostsAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<PostDTO?>> GetPost(int id)
         {
-            var post = await _postService.GetPostById(id);
+            var post = await _postService.GetPostByIdAsync(id);
             if (post == null)
                 return NotFound();
             return Ok(post);
@@ -54,11 +54,11 @@ namespace Zap_server.Controllers
                 UserId = 1 // временно
             };
 
-            await _postService.CreatePost(post);
+            await _postService.CreatePostAsync(post);
 
             if (request.File != null && request.File.Length > 0)
             {
-                var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "media");
                 if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
                 var uniqueFileName = Guid.NewGuid().ToString("N") + Path.GetExtension(request.File.FileName);
@@ -76,7 +76,7 @@ namespace Zap_server.Controllers
                     PostId = post.Id
                 };
 
-                await _mediaAttachmentService.CreateMediaAttachment(attachment);
+                await _mediaAttachmentService.CreateMediaAttachmentAsync(attachment);
             }
 
             return Ok(new { Message = "Пост создан" });
@@ -88,7 +88,7 @@ namespace Zap_server.Controllers
         {
             if (file == null || file.Length == 0) return BadRequest("No file");
 
-            var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "media");
             if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
             var uniqueFileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
@@ -108,7 +108,7 @@ namespace Zap_server.Controllers
                 CommentId = id 
             };
 
-            await _mediaAttachmentService.CreateMediaAttachment(attachment);
+            await _mediaAttachmentService.CreateMediaAttachmentAsync(attachment);
             return Ok();
         }
         [HttpPut("{id}")]
@@ -116,14 +116,14 @@ namespace Zap_server.Controllers
         {
             if (id != postDTO.Id)
                 return BadRequest();
-            await _postService.UpdatePost(postDTO);
+            await _postService.UpdatePostAsync(postDTO);
             return Ok();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePost(int id)
         {
-            await _postService.DeletePost(id);
+            await _postService.DeletePostAsync(id);
             return Ok();
         }
 
