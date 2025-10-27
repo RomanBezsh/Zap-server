@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Zap.BLL.Infrastructure;
 using Zap.BLL.Interfaces;
 using Zap.BLL.MappingProfiles;
 using Zap.BLL.Services;
+using Zap.DAL.EF;
 using Zap.DAL.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,8 +15,14 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
 // ✅ Подключение БД
-builder.Services.AddZapContext(
-    builder.Configuration.GetConnectionString("DefaultConnection"));
+
+builder.Services.AddDbContext<ZapContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .EnableSensitiveDataLogging()
+           .LogTo(Console.WriteLine, LogLevel.Information);
+});
+
 
 // ✅ Email config
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
@@ -45,7 +53,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:5173",
-                "https://localhost:5173"
+                "https://localhost:5173",
+                "https://localhost:54723"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
@@ -55,15 +64,18 @@ builder.Services.AddCors(options =>
 
 
 // ========================= APP =========================
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(options =>
 {
-    c.SupportNonNullableReferenceTypes();
-    c.MapType<IFormFile>(() => new Microsoft.OpenApi.Models.OpenApiSchema
+    options.SupportNonNullableReferenceTypes();
+
+    // Чтобы Swagger понимал multipart/form-data
+    options.MapType<IFormFile>(() => new Microsoft.OpenApi.Models.OpenApiSchema
     {
         Type = "string",
         Format = "binary"
     });
 });
+
 
 var app = builder.Build();
 

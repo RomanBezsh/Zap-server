@@ -22,12 +22,18 @@ namespace Zap.BLL.Services
 
         public async Task CreatePost(PostDTO postDTO)
         {
-            if (postDTO == null) throw new ArgumentNullException(nameof(postDTO));
+            Console.WriteLine($"🟡 CreatePost вызван в сервисе. Content: {postDTO.Content}, UserId: {postDTO.UserId}");
+
             var post = _mapper.Map<Post>(postDTO);
-            if (post.CreatedAt == default) post.CreatedAt = DateTime.UtcNow;
+            Console.WriteLine($"🧩 После маппинга: Content={post.Content}, UserId={post.UserId}");
+
             await _db.Posts.AddAsync(post);
+            Console.WriteLine("🧠 AddAsync прошёл");
+
             await _db.SaveAsync();
+            Console.WriteLine("💾 SaveAsync вызван");
         }
+
 
         public async Task UpdatePost(PostDTO postDTO)
         {

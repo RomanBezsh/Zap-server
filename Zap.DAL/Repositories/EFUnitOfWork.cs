@@ -91,6 +91,7 @@ namespace Zap.DAL.Repositories
         }
         public async Task SaveAsync()
         {
+            Console.WriteLine("🔥 EFUnitOfWork.SaveAsync() вызван");
             await _db.SaveChangesAsync();
         }
     }

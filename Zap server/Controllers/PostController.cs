@@ -43,35 +43,35 @@ namespace Zap_server.Controllers
 
         [HttpPost]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreatePost([FromForm] string content, [FromForm] IFormFile? file)
+        public async Task<IActionResult> CreatePost([FromForm] CreatePostRequestDTO request)
         {
+            Console.WriteLine($"📩 CreatePost: Content = {request.Content}");
+
             var post = new PostDTO
             {
-                Content = content,
+                Content = request.Content,
                 CreatedAt = DateTime.UtcNow,
-                UserId = 1 // временно — потом брать из токена
+                UserId = 1 // временно
             };
 
             await _postService.CreatePost(post);
 
-            if (file != null && file.Length > 0)
+            if (request.File != null && request.File.Length > 0)
             {
                 var uploadsFolder = Path.Combine(_env.ContentRootPath, "media");
                 if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                var uniqueFileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
+                var uniqueFileName = Guid.NewGuid().ToString("N") + Path.GetExtension(request.File.FileName);
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                using (var fs = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(fs);
-                }
+                using var fs = new FileStream(filePath, FileMode.Create);
+                await request.File.CopyToAsync(fs);
 
                 var attachment = new MediaAttachmentDTO
                 {
                     Url = $"/media/{uniqueFileName}",
-                    FileName = file.FileName,
-                    ContentType = file.ContentType,
+                    FileName = request.File.FileName,
+                    ContentType = request.File.ContentType,
                     UploadedAt = DateTime.UtcNow,
                     PostId = post.Id
                 };
