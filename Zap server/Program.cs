@@ -15,14 +15,8 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
 // ✅ Подключение БД
-
-builder.Services.AddDbContext<ZapContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .EnableSensitiveDataLogging()
-           .LogTo(Console.WriteLine, LogLevel.Information);
-});
-
+string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddZapContext(connection);
 
 // ✅ Email config
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
